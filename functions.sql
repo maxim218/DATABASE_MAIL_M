@@ -139,3 +139,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 /**********************************************/
+
+CREATE OR REPLACE FUNCTION find_forum_information(forum_slug_param TEXT) RETURNS TEXT AS $$
+    DECLARE forum_record forum_type;
+    DECLARE forum_exists BOOLEAN;
+    DECLARE forum_answer forum_type;
+BEGIN
+    forum_exists = False;
+    FOR forum_record IN SELECT * FROM forum WHERE LOWER(forum_slug) = LOWER(forum_slug_param) LIMIT 1 LOOP
+        forum_exists = True;
+        forum_answer = forum_record;
+    END LOOP;
+    IF(forum_exists = False) THEN
+        RETURN 'FORUM_NOT_FOUND';
+    END IF;
+    RETURN to_json(forum_answer);
+END;
+$$ LANGUAGE plpgsql;

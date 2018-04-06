@@ -1,7 +1,29 @@
 "use strict";
 
 function forumInformation(response, forumSlug) {
+    send("SELECT * FROM find_forum_information($1);", [
+        forumSlug
+    ], (obj) => {
+        log(obj);
+        let body = obj.find_forum_information;
 
+        if(body === 'FORUM_NOT_FOUND') {
+            responseGet(response, 404, JSON.stringify({
+                message: "FORUM_NOT_FOUND"
+            }));
+        } else {
+            const obj = JSON.parse(body);
+            responseGet(response, 200, JSON.stringify({
+                id: obj.forum_id,
+                posts: obj.forum_posts,
+                slug: obj.forum_slug,
+                threads: obj.forum_threads,
+                title: obj.forum_title,
+                user: obj.forum_user_nickname,
+                user_id: obj.forum_user_id
+            }));
+        }
+    });
 }
 
 function createNewForum(response, bodyObj) {
