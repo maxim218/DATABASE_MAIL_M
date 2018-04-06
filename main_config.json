@@ -1,0 +1,21 @@
+{
+  "port": 5000,
+  "database": {
+    "user": "postgres",
+    "host": "localhost",
+    "database": "maxim_database",
+    "password": "12345",
+    "port": 5432
+  },
+  "scripts": [
+    "logText.js",
+    "mainConfigRead.js",
+    "databaseConnect.js",
+    "createDatabase.js",
+    "applicationLaunch.js",
+    "responseSend.js",
+    "STUDENTmodel.js",
+    "FORUMmodel.js",
+    "urlRoute.js"
+  ]
+}

@@ -1,0 +1,7 @@
+node_modules/
+node_modules
+.idea/
+.idea
+*npm-debug.log
+*MAIN_RESULT_SCRIPT.js
+
