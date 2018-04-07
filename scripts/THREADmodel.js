@@ -1,11 +1,19 @@
 "use strict";
 
-let thread_id_count = 1;
+let thread_id_count = 1000;
+
+const S_S_F = " SELECT * FROM  ";
+const A_T_C = " AND thread_created ";
+const O_B_T = " ORDER BY thread_created ";
+const LL = " LIMIT ";
+const LL_LITLE = "limit";
+const S_I = "since";
+const DD_EE = "desc";
 
 function findListOfThreads(response, forumSlug, second) {
     const params = wordsArray(second);
 
-    send("SELECT * FROM find_forum_id($1);", [
+    send(S_S_F + " find_forum_id($1);", [
         forumSlug
     ], (obj) => {
        const forumId = parseInt(obj.find_forum_id);
@@ -15,23 +23,23 @@ function findListOfThreads(response, forumSlug, second) {
            }));
        } else {
             let v = "SELECT * FROM thread WHERE thread_forum_id = " + forumId + "  ";
-            let sortingString = getParam(params["desc"] === "true", "DESC", "ASC");
+            let sortingString = getParam(params[DD_EE] === "true", "DESC", "ASC");
 
             let sinceValue = undefined;
-            if(good(params["since"]) === true) {
-                sinceValue = params["since"];
+            if(good(params[S_I]) === true) {
+                sinceValue = params[S_I];
             }
 
             if(good(sinceValue)) {
-                if(sortingString === "ASC") v = v + " AND thread_created >= '" + sinceValue + "' ";
-                if(sortingString === "DESC") v = v + " AND thread_created <= '" + sinceValue + "' ";
+                if(sortingString === "ASC") v = v + A_T_C + " >= '" + sinceValue + "' ";
+                if(sortingString === "DESC") v = v + A_T_C + " <= '" + sinceValue + "' ";
             }
 
-            if(sortingString === "ASC") v = v + " ORDER BY thread_created ASC ";
-            if(sortingString === "DESC") v = v + " ORDER BY thread_created DESC ";
+            if(sortingString === "ASC") v = v + O_B_T + " ASC ";
+            if(sortingString === "DESC") v = v + O_B_T + " DESC ";
 
-            if(good(params['limit'])) {
-                v = v + " LIMIT " + params['limit'] + "  ";
+            if(good(params[LL_LITLE])) {
+                v = v + LL + params[LL_LITLE] + "  ";
             }
 
             v = v + " ; ";
