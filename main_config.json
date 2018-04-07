@@ -9,6 +9,7 @@
   },
   "scripts": [
     "logText.js",
+    "simpleActions.js",
     "mainConfigRead.js",
     "databaseConnect.js",
     "createDatabase.js",
@@ -16,6 +17,7 @@
     "responseSend.js",
     "STUDENTmodel.js",
     "FORUMmodel.js",
+    "THREADmodel.js",
     "urlRoute.js"
   ]
 }

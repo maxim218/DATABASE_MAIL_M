@@ -140,6 +140,20 @@ $$ LANGUAGE plpgsql;
 
 /**********************************************/
 
+CREATE OR REPLACE FUNCTION find_forum_slug(forum_number INTEGER) RETURNS TEXT AS $$
+    DECLARE forum_record RECORD;
+    DECLARE s TEXT;
+BEGIN
+    s = 'FORUM_SLUG_NOT_FOUND';
+    FOR forum_record IN SELECT forum_slug, forum_id FROM forum WHERE forum_id = forum_number LIMIT 1 LOOP
+        s = forum_record.forum_slug;
+    END LOOP;
+    RETURN s;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
 CREATE OR REPLACE FUNCTION find_forum_information(forum_slug_param TEXT) RETURNS TEXT AS $$
     DECLARE forum_record forum_type;
     DECLARE forum_exists BOOLEAN;
@@ -156,3 +170,71 @@ BEGIN
     RETURN to_json(forum_answer);
 END;
 $$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION create_new_pair(student_id_param INTEGER, forum_id_param INTEGER) RETURNS TEXT AS $$
+    DECLARE pair_exists BOOLEAN;
+    DECLARE pair_record RECORD;
+BEGIN
+    pair_exists = False;
+    FOR pair_record IN SELECT pair_student_id, pair_forum_id FROM pair WHERE student_id_param = pair_student_id AND forum_id_param = pair_forum_id LIMIT 1 LOOP
+        pair_exists = True;
+    END LOOP;
+    IF (pair_exists = False) THEN
+        INSERT INTO pair (pair_student_id, pair_forum_id) VALUES (student_id_param, forum_id_param);
+    END IF;
+    RETURN 'PAIR';
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION create_new_thread(nickname_param TEXT, created_param TIMESTAMPTZ, message_param TEXT, title_param TEXT, forum_slug_param TEXT, thread_slug_param TEXT, thread_id_param INTEGER) RETURNS TEXT AS $$
+    DECLARE forum_number INTEGER;
+    DECLARE student_number INTEGER;
+    DECLARE thread_exists BOOLEAN;
+    DECLARE thread_record thread_type;
+    DECLARE thread_answer thread_type;
+    DECLARE thread_array thread_type ARRAY;
+    DECLARE xxx TEXT;
+BEGIN
+    forum_number = find_forum_id(forum_slug_param);
+    IF(forum_number = -1) THEN
+        RETURN 'FORUM_NOT_FOUND';
+    END IF;
+    student_number = find_student_number(nickname_param);
+    IF(student_number = -1) THEN
+        RETURN 'STUDENT_NOT_FOUND';
+    END IF;
+    thread_exists = False;
+    FOR thread_record IN SELECT * FROM thread WHERE LOWER(thread_slug) = LOWER(thread_slug_param) LIMIT 1 LOOP
+        thread_exists = True;
+        thread_answer = thread_record;
+    END LOOP;
+    IF(thread_exists = True) THEN
+        RETURN to_json(thread_answer);
+    END IF;
+    INSERT INTO thread (thread_id, thread_author_nickname, thread_author_id, thread_created, thread_forum_slug, thread_forum_id, thread_message,
+    thread_slug, thread_title, thread_votes)
+    VALUES (
+        thread_id_param,
+        find_student_login(student_number),
+        student_number,
+        created_param,
+        find_forum_slug(forum_number),
+        forum_number,
+        message_param,
+        thread_slug_param,
+        title_param,
+        0
+    );
+    FOR thread_record IN SELECT * FROM thread WHERE LOWER(thread_slug_param) = LOWER(thread_slug) LIMIT 1 LOOP
+        thread_array[1] = thread_record;
+    END LOOP;
+    xxx = create_new_pair(student_number, forum_number);
+    RETURN array_to_json(thread_array);
+END;
+$$ LANGUAGE plpgsql;
+
+

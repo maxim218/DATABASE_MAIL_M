@@ -31,6 +31,12 @@ function createTable(tableName, fieldsArray) {
             body += data.toString();
             type += data.toString();
         }
+
+        if(fieldObj.type === "D") {
+            const data = "  " + tableName + "_" + fieldObj.name + ' TIMESTAMPTZ, ' + " \n";
+            body += data.toString();
+            type += data.toString();
+        }
     });
 
     const data = "  " + tableName + "_" + "flag " + "BOOLEAN \n); \n";
@@ -38,6 +44,8 @@ function createTable(tableName, fieldsArray) {
     type += data.toString();
 
     body = "\n" + body + "\n" + type + "\n";
+
+    log(body);
 
     return body;
 }
@@ -86,12 +94,59 @@ const forums = createTable("forum", [
     }
 ]);
 
+const threads = createTable("thread", [
+    {
+        name: "id",
+        type: "I",
+    }, {
+        name: "author_nickname",
+        type: "T",
+    }, {
+        name: "author_id",
+        type: "I",
+    }, {
+        name: "created",
+        type: "D",
+    }, {
+        name: "forum_slug",
+        type: "T",
+    }, {
+        name: "forum_id",
+        type: "I",
+    }, {
+        name: "message",
+        type: "T",
+    }, {
+        name: "slug",
+        type: "T",
+    }, {
+        name: "title",
+        type: "T",
+    }, {
+        name: "votes",
+        type: "I",
+    }
+]);
+
+const pairs = createTable("pair", [
+    {
+        name: "id",
+        type: "P",
+    }, {
+        name: "student_id",
+        type: "I",
+    }, {
+        name: "forum_id",
+        type: "I",
+    }
+]);
+
 const databaseContentArray = [];
 
 databaseContentArray.push(students);
 databaseContentArray.push(forums);
+databaseContentArray.push(threads);
+databaseContentArray.push(pairs);
 databaseContentArray.push(functionsDataBase);
 
 const databaseContentContentString = databaseContentArray.join("\n");
-
-log(databaseContentContentString);

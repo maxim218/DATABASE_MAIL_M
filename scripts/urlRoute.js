@@ -1,10 +1,14 @@
 "use strict";
 
+const QUESTION_CHAR = "?";
+const SLASH = "/";
+
 const U = "user";
 const C = "create";
 const P = "profile";
 const F = "forum";
 const D = "details";
+const T = "threads";
 
 application.get('/*', (request, response) => {
     log("\n\n");
@@ -21,7 +25,11 @@ application.get('/*', (request, response) => {
         return null;
     }
 
-    const parts = request.url.split("/");
+    const y = request.url.split(QUESTION_CHAR);
+    const first = y[0];
+    const second = y[1];
+
+    const parts = first.split(SLASH);
 
     if(parts[2] === U) {
         if(parts[4] === P) {
@@ -37,6 +45,12 @@ application.get('/*', (request, response) => {
         }
     }
 
+    if(parts[2] === F) {
+        if(parts[4] === T) {
+            findListOfThreads(response, parts[3], second);
+            return null;
+        }
+    }
 });
 
 application.post('/*', (request, response) => {
@@ -52,7 +66,11 @@ application.post('/*', (request, response) => {
         log("Location: " + request.url);
         log("\nBody: " + body);
 
-        const parts = request.url.split("/");
+        const y = request.url.split(QUESTION_CHAR);
+        const first = y[0];
+        const second = y[1];
+
+        const parts = first.split(SLASH);
 
         if(request.url === "/api/forum/create") {
             createNewForum(response, bodyObj);
@@ -73,6 +91,12 @@ application.post('/*', (request, response) => {
             }
         }
 
+        if(parts[2] === F) {
+            if(parts[4] === C) {
+                createNewThread(response, parts[3], bodyObj);
+                return null;
+            }
+        }
     });
 });
 
