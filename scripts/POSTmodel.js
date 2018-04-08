@@ -4,8 +4,222 @@ const ZERO = 0;
 
 let postIncrementValue = 1;
 
-function findInformationAboutListOfPosts(response, threadIDorSLUG, second) {
+const POSTS_MODEL_FLAT_TYPE = "flat";
+const POSTS_MODEL_TREE_TYPE = "tree";
+const POSTS_MODEL_PARENT_TREE_TYPE = "parent_tree";
+const SORT_P = "sort";
 
+function findPostsList(response, threadID, second) {
+    const obj = wordsArray(second);
+
+    let typePrinting = POSTS_MODEL_FLAT_TYPE;
+    if(good(obj[SORT_P])) {
+        typePrinting = obj[SORT_P].toString();
+    }
+
+    switch(typePrinting) {
+        case POSTS_MODEL_FLAT_TYPE:
+            useFlat(response, threadID, second, obj);
+            break;
+        case POSTS_MODEL_TREE_TYPE:
+            useTree(response, threadID, second, obj);
+            break;
+        case POSTS_MODEL_PARENT_TREE_TYPE:
+            useParentTree(response, threadID, second, obj);
+            break;
+    }
+}
+
+function useParentTree(response, threadID, second, obj) {
+    let data = "  ";
+
+    let typeOfSortingPosts = "ASC";
+    if(good(obj["desc"])) {
+        if(obj["desc"] === "true") typeOfSortingPosts = "DESC";
+        if(obj["desc"] === "false") typeOfSortingPosts = "ASC";
+    }
+
+    let sinceParam = null;
+    if(good(obj["since"])) {
+        sinceParam = obj["since"];
+    }
+
+    data += " WITH roots AS ( ";
+    data += " SELECT post_id FROM post ";
+    data  = data + " WHERE post_thread_id = " + threadID + " AND post_parent = 0 ";
+
+    if(sinceParam != null) {
+        if(typeOfSortingPosts === "ASC") data = data + " AND post_main_array > (SELECT post_main_array FROM post WHERE post_id = " + sinceParam + ") ";
+        if(typeOfSortingPosts === "DESC") data = data + " AND post_main_array < (SELECT post_main_array FROM post WHERE post_id = " + sinceParam + ") ";
+    }
+
+    if(typeOfSortingPosts === "ASC") data = data + "  ORDER BY post_id ASC   ";
+    if(typeOfSortingPosts === "DESC") data = data + "  ORDER BY post_id DESC  ";
+
+    if(good(obj["limit"]) === true) {
+        data = data + " LIMIT " + obj["limit"] + "   ";
+    }
+
+    data += " ) ";
+
+    data = data + " SELECT post.post_id AS id, post_student_nickname AS author, post_created AS created, post_forum_slug AS forum, post_is_edited AS isEdited, post_message AS message, post_parent AS parent, post_thread_id AS thread FROM post JOIN roots ON roots.post_id = post.post_starting_number ";
+
+    if(typeOfSortingPosts === "ASC") data += " ORDER BY post.post_main_array  ASC   ";
+    if(typeOfSortingPosts === "DESC") data += " ORDER BY post.post_main_array  DESC   ";
+
+    data += " ; ";
+
+    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    log(data);
+    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+    sendWithArr(data, [], (res) => {
+        responseGet(response, 200, JSON.stringify(res));
+    });
+}
+
+function useTree(response, threadID, second, obj) {
+    let data = "SELECT * FROM post WHERE post_thread_id = " + threadID + "  ";
+
+    let typeOfSortingPosts = "ASC";
+    if(good(obj["desc"])) {
+        if(obj["desc"] === "true") typeOfSortingPosts = "DESC";
+        if(obj["desc"] === "false") typeOfSortingPosts = "ASC";
+    }
+
+    let sinceParam = null;
+    if(good(obj["since"])) {
+        sinceParam = obj["since"];
+    }
+
+    if(sinceParam !== null) {
+        if (typeOfSortingPosts === "ASC") data = data + " AND post.post_main_array > (SELECT post_main_array FROM post WHERE post_id = " + sinceParam + ") ";
+        if (typeOfSortingPosts === "DESC") data = data + " AND post.post_main_array < (SELECT post_main_array FROM post WHERE post_id = " + sinceParam + ") ";
+    }
+
+    if(typeOfSortingPosts === "ASC") data = data + " ORDER BY post.post_main_array ASC    ";
+    if(typeOfSortingPosts === "DESC") data = data + " ORDER BY post.post_main_array DESC   ";
+
+    if(good(obj["limit"])) {
+        data = data + " LIMIT " + obj["limit"] + " ";
+    }
+
+    data += " ; ";
+
+    sendWithArr(data, [], (arr) => {
+        const res = getEmptyArray();
+        log(res);
+        arr.forEach((element) => {
+            const obj = element;
+            res.push({
+                author: obj.post_student_nickname,
+                created: obj.post_created,
+                forum: obj.post_forum_slug,
+                id: obj.post_id,
+                isEdited: obj.post_is_edited,
+                message: obj.post_message,
+                parent: obj.post_parent,
+                thread: obj.post_thread_id,
+                path: obj.path,
+                root: obj.root
+            });
+        });
+
+        responseGet(response, 200, JSON.stringify(res));
+    });
+}
+
+function useFlat(response, threadID, second, obj) {
+    let data = "SELECT * FROM post WHERE post_thread_id = " + threadID + "  ";
+
+    let typeOfSortingPosts = "ASC";
+    if(good(obj["desc"])) {
+        if(obj["desc"] === "true") typeOfSortingPosts = "DESC";
+        if(obj["desc"] === "false") typeOfSortingPosts = "ASC";
+    }
+
+    if(good(obj["since"])) {
+        if(typeOfSortingPosts === "ASC") data = data + "  AND post_id > " + obj["since"] + "  ";
+        if(typeOfSortingPosts === "DESC") data = data + "  AND post_id < " + obj["since"] + "  ";
+    }
+
+    if(typeOfSortingPosts === "ASC") data = data + "  ORDER BY post_id ASC    ";
+    if(typeOfSortingPosts === "DESC") data = data + "  ORDER BY post_id DESC   ";
+
+    if(good(obj["limit"]) === true) {
+        data = data + " LIMIT " +  obj["limit"] + " ";
+    }
+
+    data += " ; ";
+
+    sendWithArr(data, [], (arr) => {
+        const res = getEmptyArray();
+        log(res);
+        arr.forEach((element) => {
+            const obj = element;
+            res.push({
+                author: obj.post_student_nickname,
+                created: obj.post_created,
+                forum: obj.post_forum_slug,
+                id: obj.post_id,
+                isEdited: obj.post_is_edited,
+                message: obj.post_message,
+                parent: obj.post_parent,
+                thread: obj.post_thread_id,
+                path: obj.path,
+                root: obj.root
+            });
+        });
+
+        responseGet(response, 200, JSON.stringify(res));
+    });
+}
+
+function findInformationAboutListOfPosts(response, threadIDorSLUG, second) {
+    let t_id = null;
+    let t_slug = null;
+
+    if(onlyNumbers(threadIDorSLUG) === true) {
+        t_id = parseInt(threadIDorSLUG);
+    } else {
+        t_slug = threadIDorSLUG.toString();
+    }
+
+    if(t_id !== null) {
+        send("SELECT * FROM find_thread_slug($1);", [
+            parseInt(t_id)
+        ], (obj) => {
+            log(obj);
+            if(obj.find_thread_slug === "THREAD_SLUG_NOT_FOUND") {
+                responseGet(response, 404, JSON.stringify({
+                    message: "THREAD_NOT_FOUND"
+                }));
+            } else {
+                //thread exists normal
+                const threadID = parseInt(t_id);
+                findPostsList(response, threadID, second);
+            }
+        });
+    }
+
+    if(t_slug !== null) {
+        send("SELECT * FROM find_thread_id($1);", [
+            t_slug.toString()
+        ], (obj) => {
+            log(obj);
+            if(parseInt(obj.find_thread_id) === NO) {
+                responseGet(response, 404, JSON.stringify({
+                    message: "THREAD_NOT_FOUND"
+                }));
+            } else {
+                //thread exists normal
+                const threadID = parseInt(obj.find_thread_id);
+                findPostsList(response, threadID, second);
+            }
+        })
+    }
 }
 
 function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
@@ -179,7 +393,7 @@ function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
                                                     thread: threadID,
                                                     path: obj.path,
                                                     root: obj.root
-                                                })
+                                                });
                                             });
 
                                             responsePost(response, 201, JSON.stringify(res));

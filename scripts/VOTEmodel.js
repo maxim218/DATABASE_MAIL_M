@@ -70,6 +70,6 @@ function createNewVote(response, threadIDorSLUG, bodyObj) {
                 const threadID = parseInt(obj.find_thread_id);
                 createNewVoteFunction(response, threadID, bodyObj);
             }
-        })
+        });
     }
 }
