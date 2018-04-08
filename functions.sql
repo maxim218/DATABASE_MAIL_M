@@ -377,3 +377,60 @@ $$ LANGUAGE plpgsql;
 
 /**********************************************/
 
+CREATE OR REPLACE FUNCTION update_message_information_of_thread(thread_number INTEGER, message_param TEXT) RETURNS TEXT AS $$
+BEGIN
+    IF (message_param != '@@@_NOT_CHANGE') THEN
+        UPDATE thread SET thread_message = message_param WHERE thread_id = thread_number;
+    END IF;
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION update_title_information_of_thread(thread_number INTEGER, title_param TEXT) RETURNS TEXT AS $$
+BEGIN
+    IF (title_param != '@@@_NOT_CHANGE') THEN
+        UPDATE thread SET thread_title = title_param WHERE thread_id = thread_number;
+    END IF;
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION update_one_thread_inf(thread_number INTEGER, message_param TEXT, title_param TEXT) RETURNS TEXT AS $$
+    DECLARE s TEXT;
+    DECLARE thread_record thread_type;
+    DECLARE answer_string TEXT;
+BEGIN
+    s = update_message_information_of_thread(thread_number, message_param);
+    s = update_title_information_of_thread(thread_number, title_param);
+    answer_string = '{}';
+    FOR thread_record IN SELECT * FROM thread WHERE thread_id = thread_number LIMIT 1 LOOP
+        answer_string = to_json(thread_record);
+    END LOOP;
+    RETURN answer_string;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION inc_number_of_threads_in_forum(forum_slug_param TEXT) RETURNS TEXT AS $$
+BEGIN
+    UPDATE forum SET forum_threads = forum_threads + 1 WHERE LOWER(forum_slug) = LOWER(forum_slug_param);
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION inc_number_of_posts_in_forum(forum_id_param INTEGER) RETURNS TEXT AS $$
+BEGIN
+    UPDATE forum SET forum_posts = forum_posts + 1 WHERE forum_id = forum_id_param;
+    RETURN 'OK';
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+

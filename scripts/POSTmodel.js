@@ -271,7 +271,7 @@ function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
                                 const partSecond = " SELECT post_id, post_parent, post_starting_number, post_main_array FROM post WHERE post_thread_id = " + threadID + " AND post_id IN " + parents_str + " ";
                                 const resultPartQuery = partFirst + " UNION " + partSecond + ";";
 
-                                sendWithArr(resultPartQuery, [], (arr) => {
+                                sendWithArr(resultPartQuery, getEmptyArray(), (arr) => {
 
                                     log("$$$ AAAA $$$$");
 
@@ -307,29 +307,19 @@ function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
 
                                         let hugeString = "  ";
 
-                                        function copyArray(answer, arr) {
-                                            for(let i = 0; i < arr.length; i++) {
-                                                answer.push(arr[i]);
-                                            }
-                                        }
-
                                         for(let i = 0; i < posts.length; ++i) {
 
                                             postIncrementValue += 1;
                                             posts[i].id = postIncrementValue;
-                                            log("ID: " + posts[i].id);
 
                                             let find = false;
                                             for(let j = 0; j < parentsDatabseArr.length; j++) {
                                                 if(posts[i].parent === parentsDatabseArr[j].post_id) {
                                                     posts[i].root = 0;
-                                                    const mmm = parentsDatabseArr[j].post_main_array;
-
-                                                    posts[i].path = [];
-                                                    // copy arrays
-                                                    copyArray(posts[i].path, mmm);
+                                                    const helping_array = parentsDatabseArr[j].post_main_array;
+                                                    posts[i].path = getEmptyArray();
+                                                    writeFirstArrayToSecondArray(helping_array, posts[i].path);
                                                     posts[i].path.push(posts[i].id);
-
                                                     find = true;
                                                     break;
                                                 }
@@ -366,11 +356,12 @@ function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
                                             xxx = xxx + "(" + a1 + ",'" + a2 + "'," + a3 + ",'" + a4 + "','" + a5 + "'," + a6 + "," + a7 + ",'" + a8 + "'," + a9 + "," + a10 + "," + a11 + "," + a12 + "); ";
 
                                             xxx = xxx + " SELECT * FROM create_new_pair(" + posts[i].author_id + ", " + FORUM_ID + ");";
+                                            xxx = xxx + " SELECT * FROM inc_number_of_posts_in_forum(" + FORUM_ID + "); ";
 
                                             hugeString += xxx;
                                         }
 
-                                        sendWithArr(hugeString, [], (arr) => {
+                                        sendWithArr(hugeString, getEmptyArray(), (arr) => {
 
                                             let res = [];
 
@@ -449,6 +440,6 @@ function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
                 const threadID = parseInt(obj.find_thread_id);
                 createNewListOfPostsAfterThreadControl(response, threadID, bodyObj);
             }
-        })
+        });
     }
 }

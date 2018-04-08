@@ -134,6 +134,13 @@ application.post('/*', (request, response) => {
                 return null;
             }
         }
+
+        if(parts[2] === TT) {
+            if(parts[4] === D) {
+                updateInformationOfOneThread(response, parts[3], bodyObj);
+                return null;
+            }
+        }
     });
 });
 
