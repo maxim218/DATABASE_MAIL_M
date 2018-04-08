@@ -1,5 +1,7 @@
 "use strict";
 
+let numberOfAllQuerisOfClient = 0;
+
 const QUESTION_CHAR = "?";
 const SLASH = "/";
 
@@ -10,10 +12,14 @@ const F = "forum";
 const D = "details";
 const T = "threads";
 const TT = "thread";
+const V = "vote";
+const PPP = "posts";
 
 application.get('/*', (request, response) => {
     log("\n\n");
     log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+    numberOfAllQuerisOfClient += 1;
+    log("Q_Q_Q: " + numberOfAllQuerisOfClient);
     log("GET");
     log("Location: " + request.url);
 
@@ -52,6 +58,20 @@ application.get('/*', (request, response) => {
             return null;
         }
     }
+
+    if(parts[2] === TT) {
+        if(parts[4] === D) {
+            findInformationAboutOneThread(response, parts[3], second);
+            return null;
+        }
+    }
+
+    if(parts[2] === TT) {
+        if(parts[4] === PPP) {
+            findInformationAboutListOfPosts(response, parts[3], second);
+            return null;
+        }
+    }
 });
 
 application.post('/*', (request, response) => {
@@ -63,6 +83,8 @@ application.post('/*', (request, response) => {
 
         log("\n\n");
         log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        numberOfAllQuerisOfClient += 1;
+        log("Q_Q_Q: " + numberOfAllQuerisOfClient);
         log("POST");
         log("Location: " + request.url);
         log("\nBody: " + body);
@@ -102,6 +124,13 @@ application.post('/*', (request, response) => {
         if(parts[2] === TT) {
             if(parts[4] === C) {
                 createNewListOfPosts(response, parts[3], bodyObj);
+                return null;
+            }
+        }
+
+        if(parts[2] === TT) {
+            if(parts[4] === V) {
+                createNewVote(response, parts[3], bodyObj);
                 return null;
             }
         }

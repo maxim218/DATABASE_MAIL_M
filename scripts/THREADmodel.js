@@ -10,6 +10,78 @@ const LL_LITLE = "limit";
 const S_I = "since";
 const DD_EE = "desc";
 
+
+function findInformationAboutOneThread(response, threadSLUGorID, second) {
+    const threadIDorSLUG = threadSLUGorID;
+
+    let t_id = null;
+    let t_slug = null;
+
+    if(onlyNumbers(threadIDorSLUG) === true) {
+        t_id = parseInt(threadIDorSLUG);
+    } else {
+        t_slug = threadIDorSLUG.toString();
+    }
+
+    if(t_id !== null) {
+        send("SELECT * FROM thread WHERE thread_id = $1 LIMIT 1;", [
+            parseInt(t_id)
+        ], (obj) => {
+            log(obj);
+            if(obj.find_thread_slug === "THREAD_SLUG_NOT_FOUND") {
+                responsePost(response, 404, JSON.stringify({
+                    message: "THREAD_NOT_FOUND"
+                }));
+            } else {
+                const element = obj;
+                const k = {
+                    author: element.thread_author_nickname,
+                    created: element.thread_created,
+                    forum: element.thread_forum_slug,
+                    id: element.thread_id,
+                    message: element.thread_message,
+                    title: element.thread_title,
+                    votes: element.thread_votes
+                };
+                if(onlyNumbers(element.thread_slug) === false) {
+                    k.slug = element.thread_slug;
+                }
+                responseGet(response, 200, JSON.stringify(k));
+            }
+        });
+    }
+
+    if(t_slug !== null) {
+        send("SELECT * FROM thread WHERE LOWER(thread_slug) = LOWER($1) LIMIT 1;", [
+            t_slug.toString()
+        ], (obj) => {
+            log(obj);
+            if(parseInt(obj.find_thread_id) === NO) {
+                responseGet(response, 404, JSON.stringify({
+                    message: "THREAD_NOT_FOUND"
+                }));
+            } else {
+                const element = obj;
+                const k = {
+                    author: element.thread_author_nickname,
+                    created: element.thread_created,
+                    forum: element.thread_forum_slug,
+                    id: element.thread_id,
+                    message: element.thread_message,
+                    title: element.thread_title,
+                    votes: element.thread_votes
+                };
+                if(onlyNumbers(element.thread_slug) === false) {
+                    k.slug = element.thread_slug;
+                }
+                responseGet(response, 200, JSON.stringify(k));
+            }
+        })
+    }
+}
+
+
+
 function findListOfThreads(response, forumSlug, second) {
     const params = wordsArray(second);
 

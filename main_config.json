@@ -19,6 +19,7 @@
     "FORUMmodel.js",
     "THREADmodel.js",
     "POSTmodel.js",
+    "VOTEmodel.js",
     "urlRoute.js"
   ]
 }

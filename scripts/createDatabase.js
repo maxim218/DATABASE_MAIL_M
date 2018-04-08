@@ -194,6 +194,23 @@ const posts = createTable("post", [
     }
 ]);
 
+const votes = createTable("vote", [
+    {
+        name: "id",
+        type: "P",
+    },
+    {
+        name: "nickname",
+        type: "T",
+    }, {
+        name: "voice",
+        type: "I",
+    }, {
+        name: "thread_id",
+        type: "I",
+    }
+]);
+
 const databaseContentArray = [];
 
 databaseContentArray.push(students);
@@ -201,6 +218,7 @@ databaseContentArray.push(forums);
 databaseContentArray.push(threads);
 databaseContentArray.push(pairs);
 databaseContentArray.push(posts);
+databaseContentArray.push(votes);
 databaseContentArray.push(functionsDataBase);
 
 const databaseContentContentString = databaseContentArray.join("\n");

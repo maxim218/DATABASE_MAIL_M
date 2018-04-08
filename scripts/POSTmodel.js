@@ -4,6 +4,10 @@ const ZERO = 0;
 
 let postIncrementValue = 1;
 
+function findInformationAboutListOfPosts(response, threadIDorSLUG, second) {
+
+}
+
 function createNewListOfPosts(response, threadIDorSLUG, bodyObj) {
     function createNewListOfPostsAfterThreadControl(response, threadIDParam, bodyObj) {
         const created = getNow();

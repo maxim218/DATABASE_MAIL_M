@@ -350,3 +350,30 @@ $$ LANGUAGE plpgsql;
 
 /**********************************************/
 
+CREATE OR REPLACE FUNCTION create_new_vote(nickname_param TEXT, voice_param INTEGER, thread_number INTEGER) RETURNS TEXT AS $$
+    DECLARE vote_exists BOOLEAN;
+    DECLARE vote_record RECORD;
+    DECLARE r RECORD;
+    DECLARE summa INTEGER;
+BEGIN
+    vote_exists = False;
+    FOR vote_record IN SELECT vote_nickname, vote_voice, vote_thread_id FROM vote WHERE LOWER(vote_nickname) = LOWER(nickname_param) AND thread_number = vote_thread_id LIMIT 1 LOOP
+        vote_exists = True;
+    END LOOP;
+    IF (vote_exists = False) THEN
+        INSERT INTO vote (vote_nickname, vote_voice, vote_thread_id) VALUES (nickname_param, voice_param, thread_number);
+    END IF;
+    IF (vote_exists = True) THEN
+        UPDATE vote SET vote_voice = voice_param WHERE LOWER(vote_nickname) = LOWER(nickname_param) AND thread_number = vote_thread_id;
+    END IF;
+    summa = 0;
+    FOR r IN SELECT SUM(vote_voice) FROM vote WHERE thread_number = vote_thread_id LOOP
+        summa = r.sum;
+    END LOOP;
+    UPDATE thread SET thread_votes = summa WHERE thread_number = thread_id;
+    RETURN 'VOTE_OK';
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
