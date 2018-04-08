@@ -18,6 +18,7 @@
     "STUDENTmodel.js",
     "FORUMmodel.js",
     "THREADmodel.js",
+    "POSTmodel.js",
     "urlRoute.js"
   ]
 }

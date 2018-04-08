@@ -64,3 +64,20 @@ function getParam(inputIf, trueParamOut, falseParamOut) {
     return falseParamOut;
 }
 
+function emptyArray(arrayParam) {
+    if(arrayParam.length === 0) {
+        return getYes();
+    } else {
+        return getNo();
+    }
+}
+
+function getEmptyArray() {
+    return [];
+}
+
+function writeFirstArrayToSecondArray(arrayFirst, secondResultArray) {
+    arrayFirst.forEach((value) => {
+        secondResultArray.push(value);
+    });
+}

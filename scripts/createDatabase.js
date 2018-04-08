@@ -37,6 +37,19 @@ function createTable(tableName, fieldsArray) {
             body += data.toString();
             type += data.toString();
         }
+
+        if(fieldObj.type === "B") {
+            const data = "  " + tableName + "_" + fieldObj.name + ' BOOLEAN, ' + " \n";
+            body += data.toString();
+            type += data.toString();
+        }
+
+        if(fieldObj.type === "A") {
+            const data = "  " + tableName + "_" + fieldObj.name + ' INTEGER [] DEFAULT ARRAY [0], ' + " \n";
+            body += data.toString();
+            const dataType = "  " + tableName + "_" + fieldObj.name + ' INTEGER [], ' + " \n";
+            type += dataType.toString();
+        }
     });
 
     const data = "  " + tableName + "_" + "flag " + "BOOLEAN \n); \n";
@@ -141,12 +154,53 @@ const pairs = createTable("pair", [
     }
 ]);
 
+const posts = createTable("post", [
+    {
+        name: "id",
+        type: "I",
+    }, {
+        name: "student_nickname",
+        type: "T",
+    }, {
+        name: "student_id",
+        type: "I",
+    }, {
+        name: "created",
+        type: "D",
+    }, {
+        name: "forum_slug",
+        type: "T",
+    }, {
+        name: "forum_id",
+        type: "I",
+    }, {
+        name: "is_edited",
+        type: "B",
+    }, {
+        name: "message",
+        type: "T",
+    }, {
+        name: "parent",
+        type: "I",
+    }, {
+        name: "thread_id",
+        type: "I",
+    }, {
+        name: "starting_number",
+        type: "I",
+    }, {
+        name: "main_array",
+        type: "A",
+    }
+]);
+
 const databaseContentArray = [];
 
 databaseContentArray.push(students);
 databaseContentArray.push(forums);
 databaseContentArray.push(threads);
 databaseContentArray.push(pairs);
+databaseContentArray.push(posts);
 databaseContentArray.push(functionsDataBase);
 
 const databaseContentContentString = databaseContentArray.join("\n");

@@ -9,6 +9,7 @@ const P = "profile";
 const F = "forum";
 const D = "details";
 const T = "threads";
+const TT = "thread";
 
 application.get('/*', (request, response) => {
     log("\n\n");
@@ -94,6 +95,13 @@ application.post('/*', (request, response) => {
         if(parts[2] === F) {
             if(parts[4] === C) {
                 createNewThread(response, parts[3], bodyObj);
+                return null;
+            }
+        }
+
+        if(parts[2] === TT) {
+            if(parts[4] === C) {
+                createNewListOfPosts(response, parts[3], bodyObj);
                 return null;
             }
         }

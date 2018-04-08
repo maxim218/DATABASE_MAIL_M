@@ -22,7 +22,7 @@ function findListOfThreads(response, forumSlug, second) {
                message: "FORUM_NOT_FOUND"
            }));
        } else {
-            let v = "SELECT * FROM thread WHERE thread_forum_id = " + forumId + "  ";
+            let v = S_S_F + " thread WHERE thread_forum_id = " + forumId + "  ";
             let sortingString = getParam(params[DD_EE] === "true", "DESC", "ASC");
 
             let sinceValue = undefined;

@@ -239,3 +239,114 @@ $$ LANGUAGE plpgsql;
 
 /**********************************************/
 
+CREATE OR REPLACE FUNCTION find_thread_id(thread_slug_param TEXT) RETURNS INTEGER AS $$
+    DECLARE n INTEGER;
+    DECLARE thread_record RECORD;
+BEGIN
+    n = -1;
+    FOR thread_record IN SELECT thread_slug, thread_id FROM thread WHERE LOWER(thread_slug) = LOWER(thread_slug_param) LIMIT 1 LOOP
+        n = thread_record.thread_id;
+    END LOOP;
+    RETURN n;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION find_thread_slug(thread_id_param INTEGER) RETURNS TEXT AS $$
+    DECLARE s TEXT;
+    DECLARE thread_record RECORD;
+BEGIN
+    s = 'THREAD_SLUG_NOT_FOUND';
+    FOR thread_record IN SELECT thread_slug, thread_id FROM thread WHERE thread_id_param = thread_id LIMIT 1 LOOP
+        s = thread_record.thread_slug;
+    END LOOP;
+    RETURN s;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION is_parent_exists (parent_number INTEGER, thread_number INTEGER) RETURNS TEXT AS $$
+    DECLARE post_record RECORD;
+    DECLARE answer TEXT;
+BEGIN
+    answer = 'NO';
+    IF (parent_number = 0) THEN
+        answer = 'YES';
+    END IF;
+    FOR post_record IN SELECT post_id, post_thread_id FROM post WHERE post_id = parent_number AND post_thread_id = thread_number LIMIT 1 LOOP
+        answer = 'YES';
+    END LOOP;
+    RETURN answer;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION get_list_of_parents (arr INTEGER ARRAY) RETURNS TEXT AS $$
+    DECLARE n INTEGER;
+    DECLARE i INTEGER;
+    DECLARE parent_id INTEGER;
+    DECLARE result_array post_type ARRAY;
+    DECLARE post_record post_type;
+    DECLARE r INTEGER;
+BEGIN
+    n = array_length(arr, 1);
+    r = 0;
+    FOR i IN 1..n LOOP
+        parent_id = arr[i];
+        FOR post_record IN SELECT * FROM post WHERE post_id = parent_id LIMIT 1 LOOP
+            r = r + 1;
+            result_array[r] = post_record;
+        END LOOP;
+    END LOOP;
+    IF (r = 0) THEN
+        RETURN '[]';
+    END IF;
+    RETURN array_to_json(result_array);
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION are_all_parents_exists (arr INTEGER ARRAY, thread_number INTEGER) RETURNS TEXT AS $$
+    DECLARE answer TEXT;
+    DECLARE i INTEGER;
+    DECLARE n INTEGER;
+    DECLARE s TEXT;
+BEGIN
+    answer = 'YES';
+    n = array_length(arr, 1);
+    FOR i IN 1..n LOOP
+      s = is_parent_exists(arr[i], thread_number);
+      IF (s = 'NO') THEN
+        answer = 'NO';
+      END IF;
+    END LOOP;
+    RETURN answer;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION are_all_students_exists(arr TEXT ARRAY) RETURNS TEXT AS $$
+    DECLARE answer TEXT;
+    DECLARE i INTEGER;
+    DECLARE n INTEGER;
+    DECLARE x INTEGER;
+BEGIN
+    answer = 'YES';
+    n = array_length(arr, 1);
+    FOR i IN 1..n LOOP
+        x = find_student_number(arr[i]);
+        IF(x = -1) THEN
+            answer = 'NO';
+        END IF;
+    END LOOP;
+    RETURN answer;
+END;
+$$ LANGUAGE plpgsql;
+
+/**********************************************/
+
