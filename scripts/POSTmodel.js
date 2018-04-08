@@ -49,8 +49,8 @@ function useParentTree(response, threadID, second, obj) {
     data  = data + " WHERE post_thread_id = " + threadID + " AND post_parent = 0 ";
 
     if(sinceParam != null) {
-        if(typeOfSortingPosts === "ASC") data = data + " AND post_main_array > (SELECT post_main_array FROM post WHERE post_id = " + sinceParam + ") ";
-        if(typeOfSortingPosts === "DESC") data = data + " AND post_main_array < (SELECT post_main_array FROM post WHERE post_id = " + sinceParam + ") ";
+        if(typeOfSortingPosts === "ASC") data = data + " AND post_starting_number > (SELECT post_starting_number FROM post WHERE post_id = " + sinceParam + ") ";
+        if(typeOfSortingPosts === "DESC") data = data + " AND post_starting_number < (SELECT post_starting_number FROM post WHERE post_id = " + sinceParam + ") ";
     }
 
     if(typeOfSortingPosts === "ASC") data = data + "  ORDER BY post_id ASC   ";
@@ -64,16 +64,10 @@ function useParentTree(response, threadID, second, obj) {
 
     data = data + " SELECT post.post_id AS id, post_student_nickname AS author, post_created AS created, post_forum_slug AS forum, post_is_edited AS isEdited, post_message AS message, post_parent AS parent, post_thread_id AS thread FROM post JOIN roots ON roots.post_id = post.post_starting_number ";
 
-    if(typeOfSortingPosts === "ASC") data += " ORDER BY post.post_main_array  ASC   ";
-    if(typeOfSortingPosts === "DESC") data += " ORDER BY post.post_main_array  DESC   ";
+    if(typeOfSortingPosts === "ASC") data += " ORDER BY post.post_starting_number  ASC,  post.post_main_array  ";
+    if(typeOfSortingPosts === "DESC") data += " ORDER BY post.post_starting_number  DESC,  post.post_main_array  ";
 
     data += " ; ";
-
-    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    log(data);
-    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
     sendWithArr(data, [], (res) => {
         responseGet(response, 200, JSON.stringify(res));
