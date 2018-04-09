@@ -106,6 +106,115 @@ application.get('/*', (request, response) => {
     }
 });
 
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+
+let arrGlobal = getEmptyArray();
+
+let emptyProc = true;
+
+let repeatingFuncObj = setInterval(() => {
+    if(arrGlobal.length > 0) {
+        if(emptyProc === true) {
+            emptyProc = false;
+            const obj = arrGlobal[0];
+            controlPostQuery(obj.request, obj.response, obj.bodyObj);
+        }
+
+        if(emptyProc === false) {
+            const obj = arrGlobal[0];
+            if(obj.response.finished === true) {
+                arrGlobal.splice(0,1);
+                emptyProc = true;
+            }
+        }
+    }
+}, 1);
+
+function pushQueryInformationToGlobalArr(request, response, bodyObj) {
+    const resObj = {
+        request: request,
+        response: response,
+        bodyObj: bodyObj,
+    };
+    arrGlobal.push(resObj);
+}
+
+function controlPostQuery(request, response, bodyObj) {
+    const y = request.url.split(QUESTION_CHAR);
+    const first = y[0];
+    const second = y[1];
+
+    const parts = first.split(SLASH);
+
+    if(request.url === "/api/forum/create") {
+        createNewForum(response, bodyObj);
+        return null;
+    }
+
+    if(parts[2] === U) {
+        if(parts[4] === C) {
+            registrateStudent(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+
+    if(parts[2] === U) {
+        if(parts[4] === P) {
+            updateStudentInformation(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+
+    if(parts[2] === F) {
+        if(parts[4] === C) {
+            createNewThread(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+
+    if(parts[2] === TT) {
+        if(parts[4] === C) {
+            createNewListOfPosts(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+
+    if(parts[2] === TT) {
+        if(parts[4] === V) {
+            createNewVote(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+
+    if(parts[2] === TT) {
+        if(parts[4] === D) {
+            updateInformationOfOneThread(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+
+    if(parts[2] === PPPPP) {
+        if(parts[4] === D) {
+            updataMessageContentOfOnePost(response, parts[3], bodyObj);
+            return null;
+        }
+    }
+}
+
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
+
 application.post('/*', (request, response) => {
     let body = "";
     request.on('data', (data) => {
@@ -128,65 +237,7 @@ application.post('/*', (request, response) => {
             bodyObj = JSON.parse(body);
         }
 
-        const y = request.url.split(QUESTION_CHAR);
-        const first = y[0];
-        const second = y[1];
-
-        const parts = first.split(SLASH);
-
-        if(request.url === "/api/forum/create") {
-            createNewForum(response, bodyObj);
-            return null;
-        }
-
-        if(parts[2] === U) {
-            if(parts[4] === C) {
-                registrateStudent(response, parts[3], bodyObj);
-                return null;
-            }
-        }
-
-        if(parts[2] === U) {
-            if(parts[4] === P) {
-                updateStudentInformation(response, parts[3], bodyObj);
-                return null;
-            }
-        }
-
-        if(parts[2] === F) {
-            if(parts[4] === C) {
-                createNewThread(response, parts[3], bodyObj);
-                return null;
-            }
-        }
-
-        if(parts[2] === TT) {
-            if(parts[4] === C) {
-                createNewListOfPosts(response, parts[3], bodyObj);
-                return null;
-            }
-        }
-
-        if(parts[2] === TT) {
-            if(parts[4] === V) {
-                createNewVote(response, parts[3], bodyObj);
-                return null;
-            }
-        }
-
-        if(parts[2] === TT) {
-            if(parts[4] === D) {
-                updateInformationOfOneThread(response, parts[3], bodyObj);
-                return null;
-            }
-        }
-
-        if(parts[2] === PPPPP) {
-            if(parts[4] === D) {
-                updataMessageContentOfOnePost(response, parts[3], bodyObj);
-                return null;
-            }
-        }
+        pushQueryInformationToGlobalArr(request, response, bodyObj);
     });
 });
 

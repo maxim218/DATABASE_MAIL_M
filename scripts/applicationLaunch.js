@@ -11,5 +11,5 @@ application.use(function(request, response, next) {
 });
 
 application.listen(mainConfigObj.port);
-log("Launch: " + mainConfigObj.port);
-log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+console.log("Launch: " + mainConfigObj.port);
+console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
