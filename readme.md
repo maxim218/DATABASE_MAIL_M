@@ -1,1 +1,1 @@
-# Kolotovkin Mail Database
+# Kolotovkin Mail Database (with docker)
