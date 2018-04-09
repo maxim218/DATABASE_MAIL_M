@@ -7,6 +7,9 @@ function createTable(tableName, fieldsArray) {
     type += "DROP TYPE IF EXISTS " + tableName + "_type CASCADE; \n";
     type += "CREATE TYPE " + tableName + "_type AS \n";
 
+    let dropIndexString = "";
+    let createIndexString = "";
+
     let body = "";
     body = body + "DROP TABLE IF EXISTS " + tableName + "; \n";
     body = body + "CREATE TABLE IF NOT EXISTS " + tableName + " \n";
@@ -18,30 +21,93 @@ function createTable(tableName, fieldsArray) {
             body += data.toString();
             const dataType = "  " + tableName + "_" + fieldObj.name + " INTEGER, \n";
             type += dataType.toString();
+
+            fieldObj.index = true;
+
+            if(good(fieldObj.index)) {
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " DESC" + "); \n";
+            }
         }
 
         if(fieldObj.type === "T") {
             const data = "  " + tableName + "_" + fieldObj.name + ' TEXT COLLATE "ucs_basic", ' + " \n";
             body += data.toString();
             type += data.toString();
+
+            fieldObj.index = true;
+
+            if(good(fieldObj.index)) {
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " DESC" + "); \n";
+
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc_lower" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc_lower" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc_lower" + " ON " + tableName + " USING btree (LOWER(" + tableName + "_" + fieldObj.name + ") ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc_lower" + " ON " + tableName + " USING btree (LOWER(" + tableName + "_" + fieldObj.name + ") DESC" + "); \n";
+
+            }
         }
 
         if(fieldObj.type === "I") {
             const data = "  " + tableName + "_" + fieldObj.name + ' INTEGER, ' + " \n";
             body += data.toString();
             type += data.toString();
+
+            fieldObj.index = true;
+
+            if(good(fieldObj.index)) {
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " DESC" + "); \n";
+            }
         }
 
         if(fieldObj.type === "D") {
             const data = "  " + tableName + "_" + fieldObj.name + ' TIMESTAMPTZ, ' + " \n";
             body += data.toString();
             type += data.toString();
+
+            fieldObj.index = true;
+
+            if(good(fieldObj.index)) {
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " DESC" + "); \n";
+            }
         }
 
         if(fieldObj.type === "B") {
             const data = "  " + tableName + "_" + fieldObj.name + ' BOOLEAN, ' + " \n";
             body += data.toString();
             type += data.toString();
+
+            fieldObj.index = true;
+
+            if(good(fieldObj.index)) {
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " DESC" + "); \n";
+            }
         }
 
         if(fieldObj.type === "A") {
@@ -49,6 +115,17 @@ function createTable(tableName, fieldsArray) {
             body += data.toString();
             const dataType = "  " + tableName + "_" + fieldObj.name + ' INTEGER [], ' + " \n";
             type += dataType.toString();
+
+            fieldObj.index = true;
+
+            if(good(fieldObj.index)) {
+                // drop
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_asc" + "; \n";
+                dropIndexString = dropIndexString + "DROP INDEX IF EXISTS " + tableName + "_" + fieldObj.name + "_index_desc" + "; \n";
+                // create
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_asc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " ASC" + "); \n";
+                createIndexString = createIndexString + "CREATE INDEX " + tableName + "_" + fieldObj.name + "_index_desc" + " ON " + tableName + " USING btree (" + tableName + "_" + fieldObj.name + " DESC" + "); \n";
+            }
         }
     });
 
@@ -56,7 +133,7 @@ function createTable(tableName, fieldsArray) {
     body += data.toString();
     type += data.toString();
 
-    body = "\n" + body + "\n" + type + "\n";
+    body = "\n" + dropIndexString + "\n" + body + "\n" + createIndexString + "\n\n" + type + "\n";
 
     log(body);
 
