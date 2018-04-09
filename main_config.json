@@ -12,6 +12,7 @@
     "simpleActions.js",
     "mainConfigRead.js",
     "databaseConnect.js",
+    "createIndexes.js",
     "createDatabase.js",
     "applicationLaunch.js",
     "responseSend.js",
