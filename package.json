@@ -1,7 +1,7 @@
 {
   "name": "maximDB",
   "version": "1.0.0",
-  "description": "",
+  "description": "Kolotovkin Maxim Mail DataBase Project",
   "main": "index.js",
   "scripts": {
     "prestart": "clear && node mainCollector.js",
