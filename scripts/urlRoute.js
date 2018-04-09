@@ -14,6 +14,7 @@ const T = "threads";
 const TT = "thread";
 const V = "vote";
 const PPP = "posts";
+const UU = "users";
 
 application.get('/*', (request, response) => {
     log("\n\n");
@@ -24,7 +25,7 @@ application.get('/*', (request, response) => {
     log("Location: " + request.url);
 
     if(request.url === "/api") {
-        send(databaseContentContentString, [], (arr) => {
+        send(databaseContentContentString, getEmptyArray(), (arr) => {
             responseGet(response, 200, JSON.stringify({
                 message: "Query /api OK"
             }));
@@ -69,6 +70,13 @@ application.get('/*', (request, response) => {
     if(parts[2] === TT) {
         if(parts[4] === PPP) {
             findInformationAboutListOfPosts(response, parts[3], second);
+            return null;
+        }
+    }
+
+    if(parts[2] === F) {
+        if(parts[4] === UU) {
+            findAllUsersInTheForum(response, parts[3], second);
             return null;
         }
     }

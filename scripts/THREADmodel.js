@@ -277,6 +277,7 @@ function createNewThread(response, forumSlug, bodyObj) {
                     if(onlyNumbers(body.thread_slug) === false) {
                         res.slug = body.thread_slug;
                     }
+
                     responsePost(response, 201, JSON.stringify(res));
                 });
             } else {

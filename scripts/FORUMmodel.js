@@ -1,5 +1,61 @@
 "use strict";
 
+function findAllUsersInTheForum(response, forumSLUG, second) {
+    send("SELECT * FROM find_forum_id($1); ", [
+        forumSLUG.toString(),
+    ], (obj) => {
+        log(obj);
+        const forumIdParam = obj.find_forum_id;
+
+        if(obj.find_forum_id === NO) {
+            responseGet(response, 404, JSON.stringify({
+                message: "FORUM_IS_NOT_FOUND"
+            }));
+        } else {
+            let data = "  ";
+
+            data = data + "SELECT * FROM student INNER JOIN pair ON (pair_student_id = student_id) WHERE pair_forum_id = " + forumIdParam + "  ";
+
+            const obj = wordsArray(second);
+
+            let sortingTypeParam = "ASC";
+            if(good(obj["desc"])) {
+                if(obj["desc"] === "true") sortingTypeParam = "DESC";
+                if(obj["desc"] === "false") sortingTypeParam = "ASC";
+            }
+
+            if(good(obj["since"])) {
+                let sinceParam = obj["since"];
+                if(sortingTypeParam === "ASC") data = data + "  AND LOWER(student_nickname) > LOWER('" + sinceParam + "')   ";
+                if(sortingTypeParam === "DESC") data = data + "  AND LOWER(student_nickname) < LOWER('" + sinceParam + "')   ";
+            }
+
+            if(sortingTypeParam === "ASC") data = data + "  ORDER BY LOWER(student_nickname)  ASC    ";
+            if(sortingTypeParam === "DESC") data = data + "  ORDER BY LOWER(student_nickname)  DESC  ";
+
+            if(good(obj["limit"])) {
+                data = data +  "  LIMIT " + obj["limit"] + "  ";
+            }
+
+            data += " ; ";
+
+            sendWithArr(data, getEmptyArray(), (arr) => {
+                const res = getEmptyArray();
+                arr.forEach((body) => {
+                    res.push({
+                        about: body.student_about,
+                        email: body.student_email,
+                        fullname: body.student_fullname,
+                        nickname: body.student_nickname
+                    });
+                });
+
+                responseGet(response, 200, JSON.stringify(res));
+            });
+        }
+    });
+}
+
 function forumInformation(response, forumSlug) {
     send("SELECT * FROM find_forum_information($1);", [
         forumSlug
