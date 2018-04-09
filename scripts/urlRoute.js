@@ -17,9 +17,11 @@ const PPP = "posts";
 const UU = "users";
 const PPPPP = "post";
 
+const GET_POST_SLASH_STAR = '/*';
+
 let initDatabaseParam = false;
 
-application.get('/*', (request, response) => {
+application.get(GET_POST_SLASH_STAR, (request, response) => {
     log("\n\n");
     log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     numberOfAllQuerisOfClient += 1;
@@ -55,52 +57,55 @@ application.get('/*', (request, response) => {
 
     const parts = first.split(SLASH);
 
-    if(parts[2] === U) {
-        if(parts[4] === P) {
-            studentInformation(response, parts[3]);
+    const PART_2 = parts[2];
+    const PART_3 = parts[3];
+    const PART_4 = parts[4];
+
+    if(PART_2 === U) {
+        if(PART_4 === P) {
+            studentInformation(response, PART_3);
             return null;
         }
     }
 
-    if(parts[2] === F) {
-        if(parts[4] === D) {
-            forumInformation(response, parts[3]);
+    if(PART_2 === F) {
+        if(PART_4 === D) {
+            forumInformation(response, PART_3);
             return null;
         }
     }
 
-    if(parts[2] === F) {
-        if(parts[4] === T) {
-            findListOfThreads(response, parts[3], second);
+    if(PART_2 === F) {
+        if(PART_4 === T) {
+            findListOfThreads(response, PART_3, second);
             return null;
         }
     }
 
-    if(parts[2] === TT) {
-        if(parts[4] === D) {
-            findInformationAboutOneThread(response, parts[3], second);
+    if(PART_2 === TT) {
+        if(PART_4 === D) {
+            findInformationAboutOneThread(response, PART_3, second);
             return null;
         }
     }
 
-    if(parts[2] === TT) {
-        if(parts[4] === PPP) {
-            findInformationAboutListOfPosts(response, parts[3], second);
+    if(PART_2 === TT) {
+        if(PART_4 === PPP) {
+            findInformationAboutListOfPosts(response, PART_3, second);
             return null;
         }
     }
 
-    if(parts[2] === F) {
-        if(parts[4] === UU) {
-            findAllUsersInTheForum(response, parts[3], second);
+    if(PART_2 === F) {
+        if(PART_4 === UU) {
+            findAllUsersInTheForum(response, PART_3, second);
             return null;
         }
     }
 
-    if(parts[2] === PPPPP) {
-        if(parts[4] === D) {
-            log("$$$$  POST information GET $$$$");
-            findInfoAboutOnePost(response, parts[3], second);
+    if(PART_2 === PPPPP) {
+        if(PART_4 === D) {
+            findInfoAboutOnePost(response, PART_3, second);
             return null;
         }
     }
@@ -118,6 +123,8 @@ let arrGlobal = getEmptyArray();
 
 let emptyProc = true;
 
+const TIMER_WAIT_TIME_PARAM = 1;
+
 let repeatingFuncObj = setInterval(() => {
     if(arrGlobal.length > 0) {
         if(emptyProc === true) {
@@ -134,7 +141,7 @@ let repeatingFuncObj = setInterval(() => {
             }
         }
     }
-}, 1);
+}, TIMER_WAIT_TIME_PARAM);
 
 function pushQueryInformationToGlobalArr(request, response, bodyObj) {
     const resObj = {
@@ -152,56 +159,60 @@ function controlPostQuery(request, response, bodyObj) {
 
     const parts = first.split(SLASH);
 
+    const PART_2 = parts[2];
+    const PART_3 = parts[3];
+    const PART_4 = parts[4];
+
     if(request.url === "/api/forum/create") {
         createNewForum(response, bodyObj);
         return null;
     }
 
-    if(parts[2] === U) {
-        if(parts[4] === C) {
-            registrateStudent(response, parts[3], bodyObj);
+    if(PART_2 === U) {
+        if(PART_4 === C) {
+            registrateStudent(response, PART_3, bodyObj);
             return null;
         }
     }
 
-    if(parts[2] === U) {
-        if(parts[4] === P) {
-            updateStudentInformation(response, parts[3], bodyObj);
+    if(PART_2 === U) {
+        if(PART_4 === P) {
+            updateStudentInformation(response, PART_3, bodyObj);
             return null;
         }
     }
 
-    if(parts[2] === F) {
-        if(parts[4] === C) {
-            createNewThread(response, parts[3], bodyObj);
+    if(PART_2 === F) {
+        if(PART_4 === C) {
+            createNewThread(response, PART_3, bodyObj);
             return null;
         }
     }
 
-    if(parts[2] === TT) {
-        if(parts[4] === C) {
-            createNewListOfPosts(response, parts[3], bodyObj);
+    if(PART_2 === TT) {
+        if(PART_4 === C) {
+            createNewListOfPosts(response, PART_3, bodyObj);
             return null;
         }
     }
 
-    if(parts[2] === TT) {
-        if(parts[4] === V) {
-            createNewVote(response, parts[3], bodyObj);
+    if(PART_2 === TT) {
+        if(PART_4 === V) {
+            createNewVote(response, PART_3, bodyObj);
             return null;
         }
     }
 
-    if(parts[2] === TT) {
-        if(parts[4] === D) {
-            updateInformationOfOneThread(response, parts[3], bodyObj);
+    if(PART_2 === TT) {
+        if(PART_4 === D) {
+            updateInformationOfOneThread(response, PART_3, bodyObj);
             return null;
         }
     }
 
-    if(parts[2] === PPPPP) {
-        if(parts[4] === D) {
-            updataMessageContentOfOnePost(response, parts[3], bodyObj);
+    if(PART_2 === PPPPP) {
+        if(PART_4 === D) {
+            updataMessageContentOfOnePost(response, PART_3, bodyObj);
             return null;
         }
     }
@@ -215,7 +226,7 @@ function controlPostQuery(request, response, bodyObj) {
 ///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
 ///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
 
-application.post('/*', (request, response) => {
+application.post(GET_POST_SLASH_STAR, (request, response) => {
     let body = "";
     request.on('data', (data) => {
         body += data;
