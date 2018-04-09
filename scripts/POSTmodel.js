@@ -5,6 +5,66 @@ const ZAPITAY = ",";
 
 let postIncrementValue = 1;
 
+function updataMessageContentOfOnePost(response, postID, bodyObj) {
+    send("SELECT * FROM is_post_exists($1); ", [
+        parseInt(postID)
+    ], (obj) => {
+        if(obj.is_post_exists === 'NO') {
+            responsePost(response, 404, JSON.stringify({
+                message: "POST_NOT_EXISTS"
+            }));
+        } else {
+            send("SELECT post_id, post_message FROM post WHERE post_id = $1 LIMIT 1;", [
+                parseInt(postID)
+            ], (postObj) => {
+
+               let oldMesCont = postObj.post_message;
+               let newMesCont = bodyObj.message;
+
+               if(!good(newMesCont)) {
+                   newMesCont = oldMesCont;
+               }
+
+               let edited = getNo();
+
+               if(oldMesCont === newMesCont) {
+                   edited = getNo();
+               } else {
+                   edited = getYes();
+               }
+
+               send("UPDATE post SET post_message = $1, post_is_edited = $2 WHERE post_id = $3; ", [
+                   newMesCont.toString(),
+                   edited,
+                   parseInt(postID)
+               ], (p) => {
+                   send("SELECT * FROM post WHERE post_id = $1 LIMIT 1;", [
+                       parseInt(postID)
+                   ], (postObjParam) => {
+                       const post = postObjParam;
+
+                       const postRes = {
+                           author: post.post_student_nickname,
+                           created: post.post_created,
+                           forum: post.post_forum_slug,
+                           id: post.post_id,
+                           isEdited: post.post_is_edited,
+                           message: post.post_message,
+                           parent: post.post_parent,
+                           thread: post.post_thread_id,
+                           path: post.path,
+                           root: post.root
+                       };
+
+                       responsePost(response, 200, JSON.stringify(postRes));
+                   });
+               });
+
+            });
+        }
+    });
+}
+
 function findInfoAboutOnePost(response, postID, second) {
     send("SELECT * FROM is_post_exists($1);", [
         parseInt(postID),
@@ -68,6 +128,10 @@ function findInfoAboutOnePost(response, postID, second) {
                                 title: thread.thread_title,
                                 votes: thread.thread_votes,
                             };
+
+                            if(!onlyNumbers(thread.thread_slug)) {
+                                threadRes.slug = thread.thread_slug;
+                            }
 
                             let postRes = {
                                 author: post.post_student_nickname,

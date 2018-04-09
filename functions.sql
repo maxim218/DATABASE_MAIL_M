@@ -446,4 +446,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/**********************************************/
+
+CREATE OR REPLACE FUNCTION find_number_of_elements_in_database () RETURNS TEXT AS $$
+    DECLARE answer_string TEXT;
+    DECLARE rec RECORD;
+BEGIN
+    answer_string = '_';
+    FOR rec IN SELECT COUNT(*) FROM forum LOOP
+        answer_string = answer_string || CAST (rec.count AS TEXT) || '_';
+    END LOOP;
+    FOR rec IN SELECT COUNT(*) FROM post LOOP
+        answer_string = answer_string || CAST (rec.count AS TEXT) || '_';
+    END LOOP;
+    FOR rec IN SELECT COUNT(*) FROM thread LOOP
+        answer_string = answer_string || CAST (rec.count AS TEXT) || '_';
+    END LOOP;
+    FOR rec IN SELECT COUNT(*) FROM student LOOP
+        answer_string = answer_string || CAST (rec.count AS TEXT) || '_';
+    END LOOP;
+    RETURN answer_string;
+END;
+$$ LANGUAGE plpgsql;
+
+
 

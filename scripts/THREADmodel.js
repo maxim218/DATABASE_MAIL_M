@@ -107,16 +107,15 @@ function findInformationAboutOneThread(response, threadSLUGorID, second) {
     }
 
     if(t_id !== null) {
-        send("SELECT * FROM thread WHERE thread_id = $1 LIMIT 1;", [
+        sendWithArr("SELECT * FROM thread WHERE thread_id = $1 LIMIT 1;", [
             parseInt(t_id)
-        ], (obj) => {
-            log(obj);
-            if(obj.find_thread_slug === "THREAD_SLUG_NOT_FOUND") {
+        ], (arr) => {
+            if(arr.length === 0) {
                 responsePost(response, 404, JSON.stringify({
                     message: "THREAD_NOT_FOUND"
                 }));
             } else {
-                const element = obj;
+                const element = arr[0];
                 const k = {
                     author: element.thread_author_nickname,
                     created: element.thread_created,
@@ -135,16 +134,15 @@ function findInformationAboutOneThread(response, threadSLUGorID, second) {
     }
 
     if(t_slug !== null) {
-        send("SELECT * FROM thread WHERE LOWER(thread_slug) = LOWER($1) LIMIT 1;", [
+        sendWithArr("SELECT * FROM thread WHERE LOWER(thread_slug) = LOWER($1) LIMIT 1;", [
             t_slug.toString()
-        ], (obj) => {
-            log(obj);
-            if(parseInt(obj.find_thread_id) === NO) {
+        ], (arr) => {
+            if(arr.length === 0) {
                 responseGet(response, 404, JSON.stringify({
                     message: "THREAD_NOT_FOUND"
                 }));
             } else {
-                const element = obj;
+                const element = arr[0];
                 const k = {
                     author: element.thread_author_nickname,
                     created: element.thread_created,

@@ -20,6 +20,7 @@
     "THREADmodel.js",
     "POSTmodel.js",
     "VOTEmodel.js",
+    "SERVICEmodel.js",
     "urlRoute.js"
   ]
 }

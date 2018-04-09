@@ -34,6 +34,11 @@ application.get('/*', (request, response) => {
         return null;
     }
 
+    if(request.url === "/api/service/status") {
+        findNumberOfElementsInDatabase(response);
+        return null;
+    }
+
     const y = request.url.split(QUESTION_CHAR);
     const first = y[0];
     const second = y[1];
@@ -96,7 +101,7 @@ application.post('/*', (request, response) => {
     request.on('data', (data) => {
         body += data;
     }).on('end', () => {
-        const bodyObj = JSON.parse(body);
+        let bodyObj = null;
 
         log("\n\n");
         log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -105,6 +110,13 @@ application.post('/*', (request, response) => {
         log("POST");
         log("Location: " + request.url);
         log("\nBody: " + body);
+
+        if(request.url === "/api/service/clear") {
+            dropContentOfAllDataBase(response);
+            return null;
+        } else {
+            bodyObj = JSON.parse(body);
+        }
 
         const y = request.url.split(QUESTION_CHAR);
         const first = y[0];
@@ -155,6 +167,13 @@ application.post('/*', (request, response) => {
         if(parts[2] === TT) {
             if(parts[4] === D) {
                 updateInformationOfOneThread(response, parts[3], bodyObj);
+                return null;
+            }
+        }
+
+        if(parts[2] === PPPPP) {
+            if(parts[4] === D) {
+                updataMessageContentOfOnePost(response, parts[3], bodyObj);
                 return null;
             }
         }
