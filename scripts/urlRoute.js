@@ -17,6 +17,8 @@ const PPP = "posts";
 const UU = "users";
 const PPPPP = "post";
 
+let initDatabaseParam = false;
+
 application.get('/*', (request, response) => {
     log("\n\n");
     log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -26,12 +28,20 @@ application.get('/*', (request, response) => {
     log("Location: " + request.url);
 
     if(request.url === "/api") {
-        send(databaseContentContentString, getEmptyArray(), (arr) => {
+        if(initDatabaseParam === false) {
+            initDatabaseParam = true;
+            send(databaseContentContentString, getEmptyArray(), (arr) => {
+                responseGet(response, 200, JSON.stringify({
+                    message: "Query /api OK REWRITE DB"
+                }));
+            });
+            return null;
+        } else {
             responseGet(response, 200, JSON.stringify({
-                message: "Query /api OK"
+                message: "Query /api OK with not rewriting db"
             }));
-        });
-        return null;
+            return null;
+        }
     }
 
     if(request.url === "/api/service/status") {
