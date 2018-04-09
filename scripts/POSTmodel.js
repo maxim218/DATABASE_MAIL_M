@@ -201,14 +201,14 @@ function useParentTree(response, threadID, second, obj) {
     let data = "  ";
 
     let typeOfSortingPosts = "ASC";
-    if(good(obj["desc"])) {
-        if(obj["desc"] === "true") typeOfSortingPosts = "DESC";
-        if(obj["desc"] === "false") typeOfSortingPosts = "ASC";
+    if(good(obj[DESC_CONST])) {
+        if(obj[DESC_CONST] === "true") typeOfSortingPosts = "DESC";
+        if(obj[DESC_CONST] === "false") typeOfSortingPosts = "ASC";
     }
 
     let sinceParam = null;
-    if(good(obj["since"])) {
-        sinceParam = obj["since"];
+    if(good(obj[SINCE_CONST])) {
+        sinceParam = obj[SINCE_CONST];
     }
 
     data += " WITH roots AS ( ";
@@ -223,8 +223,8 @@ function useParentTree(response, threadID, second, obj) {
     if(typeOfSortingPosts === "ASC") data = data + "  ORDER BY post_id ASC   ";
     if(typeOfSortingPosts === "DESC") data = data + "  ORDER BY post_id DESC  ";
 
-    if(good(obj["limit"]) === true) {
-        data = data + " LIMIT " + obj["limit"] + "   ";
+    if(good(obj[LIMIT_CONST]) === true) {
+        data = data + " LIMIT " + obj[LIMIT_CONST] + "   ";
     }
 
     data += " ) ";
@@ -236,7 +236,7 @@ function useParentTree(response, threadID, second, obj) {
 
     data += " ; ";
 
-    sendWithArr(data, [], (res) => {
+    sendWithArr(data, getEmptyArray(), (res) => {
         responseGet(response, 200, JSON.stringify(res));
     });
 }
@@ -245,14 +245,14 @@ function useTree(response, threadID, second, obj) {
     let data = "SELECT * FROM post WHERE post_thread_id = " + threadID + "  ";
 
     let typeOfSortingPosts = "ASC";
-    if(good(obj["desc"])) {
-        if(obj["desc"] === "true") typeOfSortingPosts = "DESC";
-        if(obj["desc"] === "false") typeOfSortingPosts = "ASC";
+    if(good(obj[DESC_CONST])) {
+        if(obj[DESC_CONST] === "true") typeOfSortingPosts = "DESC";
+        if(obj[DESC_CONST] === "false") typeOfSortingPosts = "ASC";
     }
 
     let sinceParam = null;
-    if(good(obj["since"])) {
-        sinceParam = obj["since"];
+    if(good(obj[SINCE_CONST])) {
+        sinceParam = obj[SINCE_CONST];
     }
 
     if(sinceParam !== null) {
@@ -263,8 +263,8 @@ function useTree(response, threadID, second, obj) {
     if(typeOfSortingPosts === "ASC") data = data + " ORDER BY post.post_main_array ASC    ";
     if(typeOfSortingPosts === "DESC") data = data + " ORDER BY post.post_main_array DESC   ";
 
-    if(good(obj["limit"])) {
-        data = data + " LIMIT " + obj["limit"] + " ";
+    if(good(obj[LIMIT_CONST])) {
+        data = data + " LIMIT " + obj[LIMIT_CONST] + " ";
     }
 
     data += " ; ";
@@ -296,21 +296,21 @@ function useFlat(response, threadID, second, obj) {
     let data = "SELECT * FROM post WHERE post_thread_id = " + threadID + "  ";
 
     let typeOfSortingPosts = "ASC";
-    if(good(obj["desc"])) {
-        if(obj["desc"] === "true") typeOfSortingPosts = "DESC";
-        if(obj["desc"] === "false") typeOfSortingPosts = "ASC";
+    if(good(obj[DESC_CONST])) {
+        if(obj[DESC_CONST] === "true") typeOfSortingPosts = "DESC";
+        if(obj[DESC_CONST] === "false") typeOfSortingPosts = "ASC";
     }
 
-    if(good(obj["since"])) {
-        if(typeOfSortingPosts === "ASC") data = data + "  AND post_id > " + obj["since"] + "  ";
-        if(typeOfSortingPosts === "DESC") data = data + "  AND post_id < " + obj["since"] + "  ";
+    if(good(obj[SINCE_CONST])) {
+        if(typeOfSortingPosts === "ASC") data = data + "  AND post_id > " + obj[SINCE_CONST] + "  ";
+        if(typeOfSortingPosts === "DESC") data = data + "  AND post_id < " + obj[SINCE_CONST] + "  ";
     }
 
     if(typeOfSortingPosts === "ASC") data = data + "  ORDER BY post_id ASC    ";
     if(typeOfSortingPosts === "DESC") data = data + "  ORDER BY post_id DESC   ";
 
-    if(good(obj["limit"]) === true) {
-        data = data + " LIMIT " +  obj["limit"] + " ";
+    if(good(obj[LIMIT_CONST]) === true) {
+        data = data + " LIMIT " +  obj[LIMIT_CONST] + " ";
     }
 
     data += " ; ";

@@ -17,5 +17,3 @@ function getCreateIndexes() {
     data += "  ";
     return data;
 }
-
-

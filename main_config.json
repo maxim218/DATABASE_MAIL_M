@@ -9,6 +9,7 @@
   },
   "scripts": [
     "logText.js",
+    "globalConstVars.js",
     "simpleActions.js",
     "mainConfigRead.js",
     "databaseConnect.js",

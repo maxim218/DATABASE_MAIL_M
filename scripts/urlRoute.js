@@ -21,6 +21,11 @@ const GET_POST_SLASH_STAR = '/*';
 
 let initDatabaseParam = false;
 
+const API_SERVISE_STATUS_CONST = "/api/service/status";
+const API_FORUM_CREATE_CONST = "/api/forum/create";
+
+////////////////////////////
+
 application.get(GET_POST_SLASH_STAR, (request, response) => {
     log("\n\n");
     log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -46,7 +51,7 @@ application.get(GET_POST_SLASH_STAR, (request, response) => {
         }
     }
 
-    if(request.url === "/api/service/status") {
+    if(request.url === API_SERVISE_STATUS_CONST) {
         findNumberOfElementsInDatabase(response);
         return null;
     }
@@ -163,7 +168,7 @@ function controlPostQuery(request, response, bodyObj) {
     const PART_3 = parts[3];
     const PART_4 = parts[4];
 
-    if(request.url === "/api/forum/create") {
+    if(request.url === API_FORUM_CREATE_CONST) {
         createNewForum(response, bodyObj);
         return null;
     }

@@ -19,13 +19,13 @@ function findAllUsersInTheForum(response, forumSLUG, second) {
             const obj = wordsArray(second);
 
             let sortingTypeParam = "ASC";
-            if(good(obj["desc"])) {
-                if(obj["desc"] === "true") sortingTypeParam = "DESC";
-                if(obj["desc"] === "false") sortingTypeParam = "ASC";
+            if(good(obj[DESC_CONST])) {
+                if(obj[DESC_CONST] === "true") sortingTypeParam = "DESC";
+                if(obj[DESC_CONST] === "false") sortingTypeParam = "ASC";
             }
 
-            if(good(obj["since"])) {
-                let sinceParam = obj["since"];
+            if(good(obj[SINCE_CONST])) {
+                let sinceParam = obj[SINCE_CONST];
                 if(sortingTypeParam === "ASC") data = data + "  AND LOWER(student_nickname) > LOWER('" + sinceParam + "')   ";
                 if(sortingTypeParam === "DESC") data = data + "  AND LOWER(student_nickname) < LOWER('" + sinceParam + "')   ";
             }
@@ -33,8 +33,8 @@ function findAllUsersInTheForum(response, forumSLUG, second) {
             if(sortingTypeParam === "ASC") data = data + "  ORDER BY LOWER(student_nickname)  ASC    ";
             if(sortingTypeParam === "DESC") data = data + "  ORDER BY LOWER(student_nickname)  DESC  ";
 
-            if(good(obj["limit"])) {
-                data = data +  "  LIMIT " + obj["limit"] + "  ";
+            if(good(obj[LIMIT_CONST])) {
+                data = data +  "  LIMIT " + obj[LIMIT_CONST] + "  ";
             }
 
             data += " ; ";
