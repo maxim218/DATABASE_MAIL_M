@@ -434,3 +434,16 @@ $$ LANGUAGE plpgsql;
 
 /**********************************************/
 
+CREATE OR REPLACE FUNCTION is_post_exists(post_number INTEGER) RETURNS TEXT AS $$
+    DECLARE s TEXT;
+    DECLARE post_record RECORD;
+BEGIN
+    s = 'NO';
+    FOR post_record IN SELECT post_id FROM post WHERE post_id = post_number LIMIT 1 LOOP
+        s = 'YES';
+    END LOOP;
+    RETURN s;
+END;
+$$ LANGUAGE plpgsql;
+
+

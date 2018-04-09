@@ -15,6 +15,7 @@ const TT = "thread";
 const V = "vote";
 const PPP = "posts";
 const UU = "users";
+const PPPPP = "post";
 
 application.get('/*', (request, response) => {
     log("\n\n");
@@ -77,6 +78,14 @@ application.get('/*', (request, response) => {
     if(parts[2] === F) {
         if(parts[4] === UU) {
             findAllUsersInTheForum(response, parts[3], second);
+            return null;
+        }
+    }
+
+    if(parts[2] === PPPPP) {
+        if(parts[4] === D) {
+            log("$$$$  POST information GET $$$$");
+            findInfoAboutOnePost(response, parts[3], second);
             return null;
         }
     }

@@ -81,3 +81,7 @@ function writeFirstArrayToSecondArray(arrayFirst, secondResultArray) {
         secondResultArray.push(value);
     });
 }
+
+function tryToFindElementInArray(arr, stringParam) {
+    return arr.indexOf(stringParam);
+}

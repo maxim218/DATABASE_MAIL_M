@@ -1,8 +1,111 @@
 "use strict";
 
 const ZERO = 0;
+const ZAPITAY = ",";
 
 let postIncrementValue = 1;
+
+function findInfoAboutOnePost(response, postID, second) {
+    send("SELECT * FROM is_post_exists($1);", [
+        parseInt(postID),
+    ], (obj) => {
+        if(obj.is_post_exists === 'NO') {
+            responseGet(response, 404, JSON.stringify({
+                message: "POST_NOT_EXISTS"
+            }));
+        } else {
+            // POST_EXISTS_NORMAL_OK
+
+            send(" SELECT * FROM post WHERE post_id = " + postID + " LIMIT 1; ", getEmptyArray(), (ppppp) => {
+                log('11111111111');
+
+                let threadID = ppppp.post_thread_id;
+                let studentID = ppppp.post_student_id;
+                let forumID = ppppp.post_forum_id;
+
+                log("T: " + threadID + "  S: " + studentID + "  F: " + forumID);
+
+                let post = ppppp;
+
+                send(" SELECT * FROM thread WHERE thread_id = " + threadID + " LIMIT 1; ", getEmptyArray(), (ttttt) => {
+                    log('22222222222222');
+
+                    let thread = ttttt;
+
+                    send(" SELECT * FROM student WHERE student_id = " + studentID + " LIMIT 1; ", getEmptyArray(), (sssss) => {
+                        log('3333333333333');
+
+                        let student = sssss;
+
+                        send(" SELECT * FROM forum WHERE forum_id = " + forumID + " LIMIT 1; ", getEmptyArray(), (fffff) => {
+                            log('44444444444444');
+
+                            let forum = fffff;
+
+                            //////////////////////////////////////////////////////////////////////////
+
+                            let studentRes = {
+                                about: student.student_about,
+                                email: student.student_email,
+                                fullname: student.student_fullname,
+                                nickname: student.student_nickname
+                            };
+
+                            let forumRes = {
+                                posts: forum.forum_posts,
+                                slug: forum.forum_slug,
+                                threads: forum.forum_threads,
+                                title: forum.forum_title,
+                                user: forum.forum_user_nickname,
+                            };
+
+                            let threadRes = {
+                                author: thread.thread_author_nickname,
+                                created: thread.thread_created,
+                                forum: thread.thread_forum_slug,
+                                id: thread.thread_id,
+                                message: thread.thread_message,
+                                title: thread.thread_title,
+                                votes: thread.thread_votes,
+                            };
+
+                            let postRes = {
+                                author: post.post_student_nickname,
+                                created: post.post_created,
+                                forum: post.post_forum_slug,
+                                id: post.post_id,
+                                isEdited: post.post_is_edited,
+                                message: post.post_message,
+                                parent: post.post_parent,
+                                thread: post.post_thread_id,
+                                path: post.path,
+                                root: post.root
+                            };
+
+                            //////////////////////////////////////////////////////////////////////////
+
+                            const obj = wordsArray(second);
+
+                            const resultMain = {};
+
+                            if(good(obj["related"])) {
+                                const arr = obj["related"].toString().split(ZAPITAY);
+
+                                if(tryToFindElementInArray(arr, "forum") !== NO) resultMain.forum = forumRes;
+                                if(tryToFindElementInArray(arr, "thread") !== NO) resultMain.thread = threadRes;
+                                if(tryToFindElementInArray(arr, "user") !== NO) resultMain.author = studentRes;
+                            }
+
+                            resultMain.post = postRes;
+
+                            responseGet(response, 200, JSON.stringify(resultMain));
+                        });
+                    });
+                });
+            });
+        }
+    });
+}
 
 const POSTS_MODEL_FLAT_TYPE = "flat";
 const POSTS_MODEL_TREE_TYPE = "tree";
