@@ -2,16 +2,16 @@
   "name": "maximDB",
   "version": "1.0.0",
   "description": "Kolotovkin Maxim Mail DataBase Project",
-  "main": "index.js",
+  "main": "MAIN_RESULT_SCRIPT.js",
   "scripts": {
-    "prestart": "clear && node mainCollector.js",
+    "prestart": "node mainCollector.js",
     "start": "node MAIN_RESULT_SCRIPT.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "express": "^4.16.3",
     "fs": "0.0.1-security",
     "pg": "^6.1.0"
