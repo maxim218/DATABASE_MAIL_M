@@ -5,3 +5,7 @@ function log(data) {
 }
 
 // login should be hidden
+
+function cout(data) {
+    console.log(data);
+}

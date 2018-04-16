@@ -2,6 +2,11 @@
 
 const functionsDataBase = fs.readFileSync('./functions.sql', 'utf8').toString();
 
+const dropIndexesText = getDropIndexes();
+const createIndexesText = getCreateIndexes();
+
+cout(dropIndexesText);
+
 function createTable(tableName, fieldsArray) {
     let type = "";
     type += "DROP TYPE IF EXISTS " + tableName + "_type CASCADE; \n";
@@ -56,9 +61,9 @@ function createTable(tableName, fieldsArray) {
     body += data.toString();
     type += data.toString();
 
-    body = "\n" + " " + "\n" + body + "\n" + " " + "\n\n" + type + "\n";
+    cout(body);
 
-    log(body);
+    body = "\n" + " " + "\n" + body + "\n" + " " + "\n\n" + type + "\n";
 
     return body;
 }
@@ -213,9 +218,6 @@ const votes = createTable("vote", [
 
 const databaseContentArray = [];
 
-const dropIndexesText = getDropIndexes();
-const createIndexesText = getCreateIndexes();
-
 databaseContentArray.push(students);
 databaseContentArray.push(forums);
 databaseContentArray.push(threads);
@@ -225,3 +227,5 @@ databaseContentArray.push(votes);
 databaseContentArray.push(functionsDataBase);
 
 const databaseContentContentString = dropIndexesText + databaseContentArray.join("\n") + createIndexesText;
+
+cout(createIndexesText);
