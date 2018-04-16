@@ -124,6 +124,7 @@ application.get(GET_POST_SLASH_STAR, (request, response) => {
 ///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
 ///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
 
+
 let arrGlobal = getEmptyArray();
 
 let emptyProc = true;
@@ -156,6 +157,7 @@ function pushQueryInformationToGlobalArr(request, response, bodyObj) {
     };
     arrGlobal.push(resObj);
 }
+
 
 function controlPostQuery(request, response, bodyObj) {
     const y = request.url.split(QUESTION_CHAR);
@@ -253,7 +255,15 @@ application.post(GET_POST_SLASH_STAR, (request, response) => {
             bodyObj = JSON.parse(body);
         }
 
-        pushQueryInformationToGlobalArr(request, response, bodyObj);
+        const y = request.url.split(QUESTION_CHAR);
+        const first = y[0];
+        const second = y[1];
+
+        if(first === 'thread' && second === 'create') {
+            pushQueryInformationToGlobalArr(request, response, bodyObj)
+        } else {
+            controlPostQuery(request, response, bodyObj);
+        }
     });
 });
 

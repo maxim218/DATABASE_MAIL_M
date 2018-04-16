@@ -244,7 +244,7 @@ CREATE OR REPLACE FUNCTION find_thread_id(thread_slug_param TEXT) RETURNS INTEGE
     DECLARE thread_record RECORD;
 BEGIN
     n = -1;
-    FOR thread_record IN SELECT thread_slug, thread_id FROM thread WHERE LOWER(thread_slug) = LOWER(thread_slug_param) LIMIT 1 LOOP
+    FOR thread_record IN SELECT thread_id FROM thread WHERE LOWER(thread_slug) = LOWER(thread_slug_param) LIMIT 1 LOOP
         n = thread_record.thread_id;
     END LOOP;
     RETURN n;

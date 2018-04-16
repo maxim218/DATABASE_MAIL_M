@@ -6,7 +6,7 @@ function getDropIndexes() {
     let data = "\n";
     ///////////////////////////////
 
-    for(let i = 1; i <= 20; i++) {
+    for(let i = 1; i <= 30; i++) {
         data = data + "DROP INDEX IF EXISTS ind_" + i + "; \n";
     }
 
@@ -37,6 +37,11 @@ function getCreateIndexes() {
     data = data + "CREATE INDEX ind_16 ON thread USING btree (thread_forum_id, thread_created); " + "\n";
     data = data + "CREATE INDEX ind_17 ON vote USING btree (vote_thread_id, LOWER(vote_nickname), vote_nickname, vote_voice);" + "\n";
     data = data + "CREATE INDEX ind_18 ON post using btree (post_id); " + "\n";
+    data = data + "CREATE INDEX ind_19 ON student USING btree ( LOWER(student_nickname), student_id ); " + "\n";
+    data = data + "CREATE INDEX ind_20 ON vote USING btree ( vote_thread_id, LOWER(vote_nickname), vote_nickname, vote_voice ); " + "\n";
+    data = data + "CREATE INDEX ind_21 ON vote USING btree ( vote_thread_id, LOWER(vote_nickname) ); " + "\n";
+    data = data + "CREATE INDEX ind_22 ON vote USING btree ( vote_thread_id, vote_voice ); " + "\n";
+    data = data + "CREATE INDEX ind_23 ON thread USING btree ( LOWER(thread_slug), thread_id); " + "\n";
 
     ///////////////////////////////
     data += "  ";
