@@ -27,6 +27,8 @@ const API_FORUM_CREATE_CONST = "/api/forum/create";
 ////////////////////////////
 
 application.get(GET_POST_SLASH_STAR, (request, response) => {
+    console.log(request.url + "\n\n");
+
     log("\n\n");
     log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     numberOfAllQuerisOfClient += 1;
@@ -259,11 +261,7 @@ application.post(GET_POST_SLASH_STAR, (request, response) => {
         const first = y[0];
         const second = y[1];
 
-        if(first === 'thread' && second === 'create') {
-            pushQueryInformationToGlobalArr(request, response, bodyObj)
-        } else {
-            controlPostQuery(request, response, bodyObj);
-        }
+        pushQueryInformationToGlobalArr(request, response, bodyObj);
     });
 });
 
