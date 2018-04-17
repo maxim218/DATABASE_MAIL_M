@@ -257,13 +257,16 @@ application.post(GET_POST_SLASH_STAR, (request, response) => {
             bodyObj = JSON.parse(body);
         }
 
-        /*
         const y = request.url.split(QUESTION_CHAR);
         const first = y[0];
         const second = y[1];
-        */
 
-        pushQueryInformationToGlobalArr(request, response, bodyObj);
+
+        if(first === "thread" && second === "vote") {
+            controlPostQuery(request, response, bodyObj);
+        } else {
+            pushQueryInformationToGlobalArr(request, response, bodyObj);
+        }
     });
 });
 
