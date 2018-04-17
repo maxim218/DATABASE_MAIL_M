@@ -25,6 +25,13 @@ function createTable(tableName, fieldsArray) {
             type += dataType.toString();
         }
 
+        if(fieldObj.type === "Q") {
+            const data = "  " + tableName + "_" + fieldObj.name + " SERIAL PRIMARY KEY, \n";
+            body += data.toString();
+            const dataType = "  " + tableName + "_" + fieldObj.name + " INTEGER, \n";
+            type += dataType.toString();
+        }
+
         if(fieldObj.type === "T") {
             const data = "  " + tableName + "_" + fieldObj.name + ' TEXT COLLATE "ucs_basic", ' + " \n";
             body += data.toString();
@@ -115,7 +122,7 @@ const forums = createTable("forum", [
 const threads = createTable("thread", [
     {
         name: "id",
-        type: "I",
+        type: "Q",
     }, {
         name: "author_nickname",
         type: "T",
@@ -162,7 +169,7 @@ const pairs = createTable("pair", [
 const posts = createTable("post", [
     {
         name: "id",
-        type: "I",
+        type: "Q",
     }, {
         name: "student_nickname",
         type: "T",

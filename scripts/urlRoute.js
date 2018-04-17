@@ -263,7 +263,7 @@ application.post(GET_POST_SLASH_STAR, (request, response) => {
         const second = y[1];
         */
 
-        controlPostQuery(request, response, bodyObj);
+        pushQueryInformationToGlobalArr(request, response, bodyObj);
     });
 });
 

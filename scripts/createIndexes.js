@@ -43,6 +43,7 @@ function getCreateIndexes() {
     data = data + "CREATE INDEX ind_22 ON vote USING btree ( vote_thread_id, vote_voice ); " + "\n";
     data = data + "CREATE INDEX ind_23 ON thread USING btree ( LOWER(thread_slug), thread_id); " + "\n";
 
+
     ///////////////////////////////
     data += "  ";
     return data;
