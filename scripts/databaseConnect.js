@@ -11,7 +11,7 @@ pool.on("error", function(error, obj) {
 function send(content, arr, foo) {
     pool.query(content, arr, function(error, res) {
         if(error) {
-            log("Database error: " + error);
+            console.log("Database error: " + error);
         }
 
         foo(res.rows[0]);
@@ -21,7 +21,7 @@ function send(content, arr, foo) {
 function sendWithArr(content, arr, foo) {
     pool.query(content, arr, function(error, res) {
         if(error) {
-            log("Database error: " + error);
+            console.log("Database error: " + error);
         }
 
         foo(res.rows);
