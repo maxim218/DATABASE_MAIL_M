@@ -66,6 +66,7 @@ const thread = getTableSqlString("thread", ["count.id", "string.author_nickname"
 const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
 const post = getTableSqlString("post", ["count.id", "string.student_nickname", "int.student_id", "time.created",
         "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
+const vote = getTableSqlString("vote", ["string.nickname", "int.voice", "int.thread_id"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -85,6 +86,7 @@ let tablesBuffer = [
     thread,
     jointable,
     post,
+    vote,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
@@ -1039,8 +1041,6 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
 
 function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     const bufferGlobal = [];
-
-    const postNumberAll = commentsList.length;
     const created = makeCreated();
 
     info("All students exists");
@@ -1129,13 +1129,6 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
         bufferGlobal.push(buffer.join(" "));
     });
 
-    info("************************");
-    info("************************");
-    info("************************");
-    info(thread);
-    info("------------------------");
-    info(commentsList);
-
     const arr = [];
     const isEdited = false;
 
@@ -1156,6 +1149,19 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
                 });
             });
 
-            answer(response, 201, str(arr));
+            const postNumberAll = commentsList.length;
+
+            database(addPostsNumberInOneForumQuery(postNumberAll, thread))
+                .then((p) => {
+                    answer(response, 201, str(arr));
+                });
         });
+}
+
+function addPostsNumberInOneForumQuery(postNumberAll, thread) {
+    const buffer = [];
+    buffer.push("UPDATE forum SET");
+    buffer.push("forum_posts = forum_posts + " + postNumberAll + " ");
+    buffer.push("WHERE forum_id = " + thread.forumID + "; ");
+    return buffer.join(" ");
 }

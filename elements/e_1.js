@@ -62,6 +62,7 @@ const thread = getTableSqlString("thread", ["count.id", "string.author_nickname"
 const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
 const post = getTableSqlString("post", ["count.id", "string.student_nickname", "int.student_id", "time.created",
         "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
+const vote = getTableSqlString("vote", ["string.nickname", "int.voice", "int.thread_id"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -81,6 +82,7 @@ let tablesBuffer = [
     thread,
     jointable,
     post,
+    vote,
 ];
 
 const databaseTables = tablesBuffer.join("\n");

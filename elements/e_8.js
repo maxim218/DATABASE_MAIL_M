@@ -158,8 +158,6 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
 
 function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     const bufferGlobal = [];
-
-    const postNumberAll = commentsList.length;
     const created = makeCreated();
 
     info("All students exists");
@@ -248,13 +246,6 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
         bufferGlobal.push(buffer.join(" "));
     });
 
-    info("************************");
-    info("************************");
-    info("************************");
-    info(thread);
-    info("------------------------");
-    info(commentsList);
-
     const arr = [];
     const isEdited = false;
 
@@ -275,6 +266,19 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
                 });
             });
 
-            answer(response, 201, str(arr));
+            const postNumberAll = commentsList.length;
+
+            database(addPostsNumberInOneForumQuery(postNumberAll, thread))
+                .then((p) => {
+                    answer(response, 201, str(arr));
+                });
         });
+}
+
+function addPostsNumberInOneForumQuery(postNumberAll, thread) {
+    const buffer = [];
+    buffer.push("UPDATE forum SET");
+    buffer.push("forum_posts = forum_posts + " + postNumberAll + " ");
+    buffer.push("WHERE forum_id = " + thread.forumID + "; ");
+    return buffer.join(" ");
 }
