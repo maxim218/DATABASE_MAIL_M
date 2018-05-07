@@ -58,6 +58,7 @@ function getTableSqlString(table, arr) {
 }
 
 const student = getTableSqlString("student", ["count.id", "string.about", "string.email", "string.fullname", "string.nickname"]);
+const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -73,6 +74,7 @@ const indexesDrop = dropIndexes();
 
 let tablesBuffer = [
     student,
+    forum,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
@@ -82,6 +84,8 @@ function createIndexes() {
         "UNIQUE INDEX **** ON student (LOWER(student_email))",
         "UNIQUE INDEX **** ON student (LOWER(student_nickname))",
         "INDEX **** ON student (LOWER(student_nickname))",
+        "UNIQUE INDEX **** ON forum (LOWER(forum_slug))",
+        "INDEX **** ON forum (LOWER(forum_slug))",
     ];
 
     for(let i = 0; i < buffer.length; i++) {
@@ -234,7 +238,7 @@ function getQuery(request, response) {
                 message: "welcome",
             }));
         }
-        return;
+        return null;
     }
 
     const parts = request.url.split(MAIN_SPLIT_CHAR);
@@ -243,6 +247,7 @@ function getQuery(request, response) {
     const part_4 = parts[4];
 
     if(part_2 === "user" && part_4 === "profile") tryToGetInformationAboutUserInDatabase(request, response, part_3);
+    if(part_2 === "forum" && part_4 === "details") tryToGetForumInformation(request, response, part_3);
 }
 
 function postQuery(request, response) {
@@ -251,6 +256,11 @@ function postQuery(request, response) {
         dataArr.push(data.toString());
     }).on('end', () => {
         const mainObj = obj(dataArr.join(""));
+
+        if(request.url === "/api/forum/create") {
+            tryToAddNewForumOfStudentToDatabase(request, response, mainObj);
+            return null;
+        }
 
         const parts = request.url.split(MAIN_SPLIT_CHAR);
         const part_2 = parts[2];
@@ -339,11 +349,11 @@ function getStudentCountFromArr(part_3) {
 function tryToUpdateInformationAboutUser(request, response, mainObj, part_3) {
     database(getStudentCountFromArr(part_3))
         .then((p) => {
-            const count = p.rows[0].count;
-            if(count === 0) {
+            const count = parseInt(p.rows[0].count);
+            if(!count) {
                 answer(response, 404, str({
                     message: part_3,
-                }))
+                }));
             } else {
                 tryToUpdateInformationAboutUserAfterControlUserExists(request, response, mainObj, part_3);
             }
@@ -434,6 +444,108 @@ function tryToAddUserToDatabase(request, response, mainObj, part_3) {
                     email: mainObj.email,
                     fullname: mainObj.fullname,
                     nickname: part_3,
+                }));
+            }
+        })
+}
+
+
+
+
+
+// ********************************
+// element 6
+
+"use strict";
+
+function getTheOneStudentQuery(mainObj) {
+    const buffer = [];
+    buffer.push("SELECT student_nickname FROM student WHERE");
+    buffer.push("LOWER(student_nickname) = LOWER('" + mainObj.user + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function tryToAddNewForumOfStudentToDatabase(request, response, mainObj) {
+    database(getTheOneStudentQuery(mainObj))
+        .then((p) => {
+            if(!p.rows.length) {
+                answer(response, 404, str({
+                    message: mainObj.user,
+                }));
+            } else {
+                insertForumOfStudentToDatabase(request, response, mainObj, p.rows[0].student_nickname);
+            }
+        });
+}
+
+function addStudentForumInDatabaseQuery(mainObj, student) {
+    const buffer = [];
+    buffer.push("INSERT INTO forum");
+    buffer.push("(forum_posts, forum_slug, forum_threads, forum_title, forum_nickname)");
+    buffer.push("VALUES (0, '" + mainObj.slug + "', 0, '" + mainObj.title + "', '" + student + "');");
+    return buffer.join(" ");
+}
+
+function getObjOneForumOfStudentQuery(mainObj) {
+    const buffer = [];
+    buffer.push("SELECT * FROM forum");
+    buffer.push("WHERE LOWER(forum_slug) = LOWER('" + mainObj.slug + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function insertForumOfStudentToDatabase(request, response, mainObj, student) {
+    database(addStudentForumInDatabaseQuery(mainObj, student))
+        .then((p) => {
+            if(!p.err) {
+                answer(response, 201, str({
+                    posts: 0,
+                    slug: mainObj.slug,
+                    threads: 0,
+                    title: mainObj.title,
+                    user: student,
+
+                }));
+            } else {
+                database(getObjOneForumOfStudentQuery(mainObj))
+                    .then((p) => {
+                        const data = p.rows[0];
+                        answer(response, 409, str({
+                           posts: data.forum_posts,
+                           slug: data.forum_slug,
+                           threads: data.forum_threads,
+                           title: data.forum_title,
+                           user: data.forum_nickname,
+                        }));
+                    });
+            }
+        })
+}
+
+function tryOneForumBySlugValue(part_3) {
+    const buffer = [];
+    buffer.push("SELECT * FROM forum");
+    buffer.push("WHERE LOWER(forum_slug) = LOWER('" + part_3 + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function tryToGetForumInformation(request, response, part_3) {
+    database(tryOneForumBySlugValue(part_3))
+        .then((p) => {
+            if(!p.rows.length) {
+                answer(response, 404, str({
+                    message: part_3,
+                }));
+            } else {
+                const data = p.rows[0];
+                answer(response, 200, str({
+                    posts: data.forum_posts,
+                    slug: data.forum_slug,
+                    threads: data.forum_threads,
+                    title: data.forum_title,
+                    user: data.forum_nickname,
                 }));
             }
         })

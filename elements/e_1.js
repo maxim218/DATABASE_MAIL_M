@@ -53,6 +53,7 @@ function getTableSqlString(table, arr) {
 }
 
 const student = getTableSqlString("student", ["count.id", "string.about", "string.email", "string.fullname", "string.nickname"]);
+const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -68,6 +69,7 @@ const indexesDrop = dropIndexes();
 
 let tablesBuffer = [
     student,
+    forum,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
@@ -77,6 +79,8 @@ function createIndexes() {
         "UNIQUE INDEX **** ON student (LOWER(student_email))",
         "UNIQUE INDEX **** ON student (LOWER(student_nickname))",
         "INDEX **** ON student (LOWER(student_nickname))",
+        "UNIQUE INDEX **** ON forum (LOWER(forum_slug))",
+        "INDEX **** ON forum (LOWER(forum_slug))",
     ];
 
     for(let i = 0; i < buffer.length; i++) {

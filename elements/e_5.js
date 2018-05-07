@@ -68,11 +68,11 @@ function getStudentCountFromArr(part_3) {
 function tryToUpdateInformationAboutUser(request, response, mainObj, part_3) {
     database(getStudentCountFromArr(part_3))
         .then((p) => {
-            const count = p.rows[0].count;
-            if(count === 0) {
+            const count = parseInt(p.rows[0].count);
+            if(!count) {
                 answer(response, 404, str({
                     message: part_3,
-                }))
+                }));
             } else {
                 tryToUpdateInformationAboutUserAfterControlUserExists(request, response, mainObj, part_3);
             }
