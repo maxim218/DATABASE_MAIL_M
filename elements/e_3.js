@@ -90,6 +90,14 @@ function getSince(argumentsArr) {
     return since;
 }
 
+function getLimit(argumentsArr) {
+    let limit = null;
+    if(argumentsArr["limit"]) {
+        limit = argumentsArr["limit"];
+    }
+    return limit;
+}
+
 function getSort(argumentsArr) {
     let sortingString = "ASC";
     if(argumentsArr["desc"] === "true") {

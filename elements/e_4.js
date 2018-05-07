@@ -21,8 +21,8 @@ function getQuery(request, response) {
     }
 
     const arr = request.url.split("?");
-    const a0 = arr[0].toString();
-    const a1 = arr[1].toString();
+    const a0 = arr[0] + "";
+    const a1 = arr[1] + "";
 
     const parts = a0.split(MAIN_SPLIT_CHAR);
     const part_2 = parts[2];

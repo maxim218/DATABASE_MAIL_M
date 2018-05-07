@@ -103,3 +103,7 @@ const indexesCreate = createIndexes();
 
 const result = indexesDrop.toString() + "\n" + databaseTables.toString() + "\n" + indexesCreate.toString();
 console.log(result);
+
+function getObj() {
+    return {};
+}

@@ -186,14 +186,46 @@ function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
 }
 
 function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr, forum) {
-
-
-
+    const since = getSince(argumentsArr);
+    const vector = getSort(argumentsArr);
     const buffer = [];
-
     buffer.push("SELECT * FROM thread");
     buffer.push("WHERE thread_forum_id = " + forum.id + " ");
+    if(since) {
+        if(vector === "ASC") {
+            buffer.push("AND thread_created >= '" + since + "' ");
+        } else {
+            buffer.push("AND thread_created <= '" + since + "' ");
+        }
+    }
+    buffer.push(" ORDER BY thread_created " + vector + " ");
+    const limit = getLimit(argumentsArr);
+    if(limit) {
+        buffer.push("LIMIT " + limit);
+    }
+    buffer.push(" ; ");
+    const bufferQuery = buffer.join(" ");
+    database(bufferQuery)
+        .then((p) => {
+            const arr = [];
+            p.rows.forEach((element) => {
+                const thread = {
+                    author: element.thread_author_nickname,
+                    created: element.thread_created,
+                    forum: element.thread_forum_slug,
+                    id: element.thread_id,
+                    message: element.thread_message,
+                    title: element.thread_title,
+                    votes: element.thread_votes,
+                };
 
+                if(onlyNumbers(element.thread_slug) === false) {
+                    thread.slug = element.thread_slug;
+                }
 
+                arr.push(thread);
+            });
 
+            answer(response, 200, str(arr));
+        });
 }

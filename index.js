@@ -109,6 +109,10 @@ const indexesCreate = createIndexes();
 const result = indexesDrop.toString() + "\n" + databaseTables.toString() + "\n" + indexesCreate.toString();
 console.log(result);
 
+function getObj() {
+    return {};
+}
+
 
 
 
@@ -272,6 +276,14 @@ function getSince(argumentsArr) {
     return since;
 }
 
+function getLimit(argumentsArr) {
+    let limit = null;
+    if(argumentsArr["limit"]) {
+        limit = argumentsArr["limit"];
+    }
+    return limit;
+}
+
 function getSort(argumentsArr) {
     let sortingString = "ASC";
     if(argumentsArr["desc"] === "true") {
@@ -312,8 +324,8 @@ function getQuery(request, response) {
     }
 
     const arr = request.url.split("?");
-    const a0 = arr[0].toString();
-    const a1 = arr[1].toString();
+    const a0 = arr[0] + "";
+    const a1 = arr[1] + "";
 
     const parts = a0.split(MAIN_SPLIT_CHAR);
     const part_2 = parts[2];
@@ -822,14 +834,46 @@ function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
 }
 
 function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr, forum) {
-
-
-
+    const since = getSince(argumentsArr);
+    const vector = getSort(argumentsArr);
     const buffer = [];
-
     buffer.push("SELECT * FROM thread");
     buffer.push("WHERE thread_forum_id = " + forum.id + " ");
+    if(since) {
+        if(vector === "ASC") {
+            buffer.push("AND thread_created >= '" + since + "' ");
+        } else {
+            buffer.push("AND thread_created <= '" + since + "' ");
+        }
+    }
+    buffer.push(" ORDER BY thread_created " + vector + " ");
+    const limit = getLimit(argumentsArr);
+    if(limit) {
+        buffer.push("LIMIT " + limit);
+    }
+    buffer.push(" ; ");
+    const bufferQuery = buffer.join(" ");
+    database(bufferQuery)
+        .then((p) => {
+            const arr = [];
+            p.rows.forEach((element) => {
+                const thread = {
+                    author: element.thread_author_nickname,
+                    created: element.thread_created,
+                    forum: element.thread_forum_slug,
+                    id: element.thread_id,
+                    message: element.thread_message,
+                    title: element.thread_title,
+                    votes: element.thread_votes,
+                };
 
+                if(onlyNumbers(element.thread_slug) === false) {
+                    thread.slug = element.thread_slug;
+                }
 
+                arr.push(thread);
+            });
 
+            answer(response, 200, str(arr));
+        });
 }
