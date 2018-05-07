@@ -21,6 +21,7 @@ const DROP_INDEX = "DROP INDEX IF EXISTS index_";
 const MAIN_PORT = 5000;
 const ALLOW_ALL_PATH = '/*';
 const MAIN_SPLIT_CHAR = "/";
+const ARR = " INTEGER [] DEFAULT ARRAY [0]";
 
 console.log("*************************************\n\n");
 
@@ -45,6 +46,9 @@ function getTableSqlString(table, arr) {
             case "time":
                 buffer.push(beginString + value.split(".")[1] + TIME);
                 break;
+            case "arr":
+                buffer.push(beginString + value.split(".")[1] + ARR);
+                break;
         }
     });
 
@@ -61,6 +65,8 @@ const student = getTableSqlString("student", ["count.id", "string.about", "strin
 const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
 const thread = getTableSqlString("thread", ["count.id", "string.author_nickname", "int.author_id", "time.created", "string.forum_slug", "int.forum_id", "string.message", "string.slug", "string.title", "int.votes"]);
 const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
+const post = getTableSqlString("post", ["count.id", "string.student_nickname", "int.student_id", "time.created",
+        "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -79,6 +85,7 @@ let tablesBuffer = [
     forum,
     thread,
     jointable,
+    post,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
@@ -292,6 +299,12 @@ function getSort(argumentsArr) {
     return sortingString;
 }
 
+function makeDouble(resultArray, buffer) {
+    buffer.forEach((element) => {
+        resultArray.push(element);
+    });
+}
+
 
 
 
@@ -359,6 +372,7 @@ function postQuery(request, response) {
         if(part_2 === "user" && part_4 === "create") tryToAddUserToDatabase(request, response, mainObj, part_3);
         if(part_2 === "user" && part_4 === "profile") tryToUpdateInformationAboutUser(request, response, mainObj, part_3);
         if(part_2 === "forum" && part_4 === "create") tryToCreateThreadInForum(request, response, mainObj, part_3);
+        if(part_2 === "thread" && part_4 === "create") tryToAddBigListOfPosts(request, response, mainObj, part_3);
 
     });
 }
@@ -875,5 +889,293 @@ function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr
             });
 
             answer(response, 200, str(arr));
+        });
+}
+
+
+
+
+
+// ********************************
+// element 8
+
+"use strict";
+
+let postCounter = 42;
+
+function controlThreadParamsSlugAndIdParam(threadSlugId, continueMethod) {
+    const buffer = [];
+    buffer.push("SELECT thread_id, thread_slug, thread_forum_slug, thread_forum_id FROM thread");
+
+    if(onlyNumbers(threadSlugId)) {
+        const id = parseInt(threadSlugId);
+        buffer.push("WHERE thread_id = " + id + " ");
+    } else {
+        const slug = threadSlugId.toString();
+        buffer.push("WHERE LOWER(thread_slug) = LOWER('" + slug + "') ");
+    }
+
+    buffer.push("LIMIT 1;");
+    const bufferStr = buffer.join(" ");
+
+    database(bufferStr)
+        .then((p) => {
+           let thread = null;
+           if(p.rows.length) {
+               thread = {
+                   id: p.rows[0].thread_id,
+                   slug: p.rows[0].thread_slug,
+                   forumSlug: p.rows[0].thread_forum_slug,
+                   forumID: p.rows[0].thread_forum_id,
+               }
+           }
+           continueMethod(thread);
+        });
+}
+
+function tryToAddBigListOfPosts(request, response, commentsList, part_3) {
+    controlThreadParamsSlugAndIdParam(part_3, (thread) => {
+        if(!thread) {
+            answer(response, 404, str({
+                message: part_3,
+            }));
+        } else {
+            info("Thread OK");
+            if(!commentsList.length) {
+                info("Empty posts array");
+                answer(response, 201, str([]));
+            } else {
+                info("Big posts array");
+                tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, thread);
+            }
+        }
+    });
+}
+
+function addParentIfNessesary(commentsList) {
+    commentsList.forEach((comment) => {
+        if(!comment.parent) {
+            comment.parent = 0;
+        }
+    });
+}
+
+function generateSetMapQuery(parrents, thread) {
+    const setMapStr = parrents.join(",");
+    const buffer = [];
+    buffer.push("SELECT post_id, post_main_array FROM post");
+    buffer.push("WHERE post_thread_id = " + thread.id + " ");
+    buffer.push("AND");
+    buffer.push("post_id IN (" + setMapStr + "); ");
+    return buffer.join(" ");
+}
+
+function getParrentsListFromObj(commentsList) {
+    const parrents = [];
+    commentsList.forEach((comment) => {
+        parrents.push(comment.parent);
+    });
+    return parrents;
+}
+
+function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, thread) {
+    addParentIfNessesary(commentsList);
+    const parrents = getParrentsListFromObj(commentsList);
+    database(generateSetMapQuery(parrents, thread))
+        .then((p) => {
+            const parrentsExistingInDatabase = p.rows;
+            let result = "YES";
+
+            commentsList.forEach((comment) => {
+                let exists = false;
+                if(!comment.parent) {
+                    exists = true;
+                }
+                if(!exists) {
+                    parrentsExistingInDatabase.forEach((parrentComment) => {
+                        if (comment.parent === parrentComment.post_id) {
+                            exists = true;
+                        }
+                    });
+                }
+                if(!exists) {
+                    result = "NO";
+                }
+            });
+            if(result === "NO") {
+                answer(response, 409, str({
+                    message: result,
+                }));
+            } else {
+                tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3, thread, parrentsExistingInDatabase);
+            }
+        });
+}
+
+function getListStudentsPost(commentsList) {
+    const studentsLower = [];
+    commentsList.forEach((comment) => {
+        const studentNickname = comment.author;
+        const lower = " LOWER('" + studentNickname + "') ";
+        studentsLower.push(lower);
+    });
+    return studentsLower.join(",");
+}
+
+function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
+    info("All parents exists");
+
+    const buffer = [];
+    buffer.push("SELECT student_id, student_nickname FROM student");
+    buffer.push("WHERE LOWER(student_nickname) IN (" + getListStudentsPost(commentsList) + ");");
+    const bufferStrQuery = buffer.join(" ");
+
+    database(bufferStrQuery)
+        .then((p) => {
+            const studentsExistsInDatabase = p.rows;
+            let result = "YES";
+            commentsList.forEach((comment) => {
+                let exists = false;
+                studentsExistsInDatabase.forEach((student) => {
+                    if(comment.author.toLowerCase() === student.student_nickname.toLowerCase()) {
+                        exists = true;
+                        comment.studentId = student.student_id;
+                        comment.author = student.student_nickname;
+                    }
+                });
+                if(!exists) {
+                    result = "NO";
+                }
+            });
+            if(result === "NO") {
+                answer(response, 404, str({
+                    message: result,
+                }))
+            } else {
+                tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase);
+            }
+        });
+}
+
+function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
+    const bufferGlobal = [];
+
+    const postNumberAll = commentsList.length;
+    const created = makeCreated();
+
+    info("All students exists");
+
+    commentsList.forEach((comment) => {
+        postCounter += 1;
+        comment.commentID = postCounter;
+
+        let exists = false;
+
+        parrentsExistingInDatabase.forEach((parent) => {
+            if(comment.parent === parent.post_id) {
+                comment.root = 0;
+                let arr = parent.post_main_array;
+                comment.path = [];
+                makeDouble(comment.path, arr);
+                exists = true;
+            }
+        });
+
+        if(!exists || comment.parent === 0) {
+            comment.root = comment.commentID;
+            comment.path = " ARRAY [ " + comment.commentID + " ] ";
+        } else {
+            comment.root = comment.path[0];
+            comment.path = "ARRAY [ " +  comment.path.join(" , ") + " ] ";
+        }
+
+        comment.path = "" + comment.path;
+
+        const buffer = [];
+        buffer.push("INSERT INTO post (");
+
+        buffer.push('post_id');
+        buffer.push(" , ");
+        buffer.push('post_student_nickname');
+        buffer.push(" , ");
+        buffer.push('post_student_id');
+        buffer.push(" , ");
+        buffer.push('post_created');
+        buffer.push(" , ");
+        buffer.push('post_forum_slug');
+        buffer.push(" , ");
+        buffer.push('post_forum_id');
+        buffer.push(" , ");
+        buffer.push('post_is_edited');
+        buffer.push(" , ");
+        buffer.push('post_message');
+        buffer.push(" , ");
+        buffer.push('post_parent');
+        buffer.push(" , ");
+        buffer.push('post_thread_id');
+        buffer.push(" , ");
+        buffer.push('post_starting_number');
+        buffer.push(" , ");
+        buffer.push('post_main_array');
+
+        buffer.push(') VALUES (');
+
+        buffer.push(comment.commentID);
+        buffer.push(" , ");
+        buffer.push("'" + comment.author + "'");
+        buffer.push(" , ");
+        buffer.push(comment.studentId);
+        buffer.push(" , ");
+        buffer.push("'" + created + "'");
+        buffer.push(" , ");
+        buffer.push("'" + thread.forumSlug + "'");
+        buffer.push(" , ");
+        buffer.push(thread.forumID);
+        buffer.push(" , ");
+        buffer.push("False");
+        buffer.push(" , ");
+        buffer.push("'" + comment.message + "'");
+        buffer.push(" , ");
+        buffer.push(comment.parent);
+        buffer.push(" , ");
+        buffer.push(thread.id);
+        buffer.push(" , ");
+        buffer.push(comment.root);
+        buffer.push(" , ");
+        buffer.push(comment.path);
+
+        buffer.push(' ); ');
+
+        bufferGlobal.push(buffer.join(" "));
+    });
+
+    info("************************");
+    info("************************");
+    info("************************");
+    info(thread);
+    info("------------------------");
+    info(commentsList);
+
+    const arr = [];
+    const isEdited = false;
+
+    const bufferStr = bufferGlobal.join(" ");
+    database(bufferStr)
+        .then((p) => {
+            info("adding comment ok");
+            commentsList.forEach((comment) => {
+                arr.push({
+                    author: comment.author,
+                    created: created,
+                    forum: thread.forumSlug,
+                    id: comment.commentID,
+                    isEdited: isEdited,
+                    message: comment.message,
+                    parent: comment.parent,
+                    thread: thread.id,
+                });
+            });
+
+            answer(response, 201, str(arr));
         });
 }

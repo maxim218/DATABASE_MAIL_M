@@ -56,6 +56,7 @@ function postQuery(request, response) {
         if(part_2 === "user" && part_4 === "create") tryToAddUserToDatabase(request, response, mainObj, part_3);
         if(part_2 === "user" && part_4 === "profile") tryToUpdateInformationAboutUser(request, response, mainObj, part_3);
         if(part_2 === "forum" && part_4 === "create") tryToCreateThreadInForum(request, response, mainObj, part_3);
+        if(part_2 === "thread" && part_4 === "create") tryToAddBigListOfPosts(request, response, mainObj, part_3);
 
     });
 }

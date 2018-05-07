@@ -106,4 +106,10 @@ function getSort(argumentsArr) {
     return sortingString;
 }
 
+function makeDouble(resultArray, buffer) {
+    buffer.forEach((element) => {
+        resultArray.push(element);
+    });
+}
+
 

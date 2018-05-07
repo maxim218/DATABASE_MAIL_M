@@ -16,6 +16,7 @@ const DROP_INDEX = "DROP INDEX IF EXISTS index_";
 const MAIN_PORT = 5000;
 const ALLOW_ALL_PATH = '/*';
 const MAIN_SPLIT_CHAR = "/";
+const ARR = " INTEGER [] DEFAULT ARRAY [0]";
 
 console.log("*************************************\n\n");
 
@@ -40,6 +41,9 @@ function getTableSqlString(table, arr) {
             case "time":
                 buffer.push(beginString + value.split(".")[1] + TIME);
                 break;
+            case "arr":
+                buffer.push(beginString + value.split(".")[1] + ARR);
+                break;
         }
     });
 
@@ -56,6 +60,8 @@ const student = getTableSqlString("student", ["count.id", "string.about", "strin
 const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
 const thread = getTableSqlString("thread", ["count.id", "string.author_nickname", "int.author_id", "time.created", "string.forum_slug", "int.forum_id", "string.message", "string.slug", "string.title", "int.votes"]);
 const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
+const post = getTableSqlString("post", ["count.id", "string.student_nickname", "int.student_id", "time.created",
+        "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -74,6 +80,7 @@ let tablesBuffer = [
     forum,
     thread,
     jointable,
+    post,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
