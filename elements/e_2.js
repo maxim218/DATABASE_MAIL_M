@@ -25,6 +25,7 @@ connectParamsObj["port"] =  PORT;
 const connectObj = new pg.Pool(connectParamsObj);
 
 function database(queryContentString) {
+    info("Query: " + queryContentString);
     return new Promise((resolve) => {
         connectObj.query(queryContentString, [], (err, ok) => {
             if (err) {
@@ -50,3 +51,6 @@ function answer(response, code, content) {
     response.end(content);
 }
 
+function makeCreated() {
+    return new Date().toISOString().toString();
+}

@@ -20,13 +20,20 @@ function getQuery(request, response) {
         return null;
     }
 
-    const parts = request.url.split(MAIN_SPLIT_CHAR);
+    const arr = request.url.split("?");
+    const a0 = arr[0].toString();
+    const a1 = arr[1].toString();
+
+    const parts = a0.split(MAIN_SPLIT_CHAR);
     const part_2 = parts[2];
     const part_3 = parts[3];
     const part_4 = parts[4];
 
+    const argumentsArr = wordsArray(a1);
+
     if(part_2 === "user" && part_4 === "profile") tryToGetInformationAboutUserInDatabase(request, response, part_3);
     if(part_2 === "forum" && part_4 === "details") tryToGetForumInformation(request, response, part_3);
+    if(part_2 === "forum" && part_4 === "threads") tryToGetForumThreadsList(request, response, part_3, argumentsArr);
 }
 
 function postQuery(request, response) {
@@ -48,6 +55,7 @@ function postQuery(request, response) {
 
         if(part_2 === "user" && part_4 === "create") tryToAddUserToDatabase(request, response, mainObj, part_3);
         if(part_2 === "user" && part_4 === "profile") tryToUpdateInformationAboutUser(request, response, mainObj, part_3);
+        if(part_2 === "forum" && part_4 === "create") tryToCreateThreadInForum(request, response, mainObj, part_3);
 
     });
 }

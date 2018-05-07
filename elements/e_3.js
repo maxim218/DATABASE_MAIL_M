@@ -40,3 +40,62 @@ function addGetPostEvents() {
 }
 
 addGetPostEvents();
+
+const NUMBERS = "1234567890";
+
+const NO = -1;
+
+function getYes() {
+    return true;
+}
+
+function getNo() {
+    return false;
+}
+
+function onlyNumbers(stringContentParam) {
+    for(let i = 0; i < stringContentParam.length; ++i) {
+        const stringElement = stringContentParam.charAt(i);
+        if(NUMBERS.indexOf(stringElement) === NO) {
+            return getNo();
+        }
+    }
+    return getYes();
+}
+
+const URL_SPLITTER = "&";
+const EQUAL_CHAR = "=";
+
+function wordsArray(stringContentParam) {
+    if(stringContentParam) {
+        const wordsObject = getObj();
+        const a = stringContentParam.split(URL_SPLITTER);
+        a.forEach((element) => {
+            const q = element.toString().split(EQUAL_CHAR);
+            const w1 = q[0];
+            const w2 = q[1];
+            wordsObject[w1] = decodeURIComponent(w2);
+        });
+        return wordsObject;
+    } else {
+        return {};
+    }
+}
+
+function getSince(argumentsArr) {
+    let since = null;
+    if(argumentsArr["since"]) {
+        since = argumentsArr["since"];
+    }
+    return since;
+}
+
+function getSort(argumentsArr) {
+    let sortingString = "ASC";
+    if(argumentsArr["desc"] === "true") {
+        sortingString = "DESC";
+    }
+    return sortingString;
+}
+
+

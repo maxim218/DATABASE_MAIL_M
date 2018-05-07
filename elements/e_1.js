@@ -54,11 +54,13 @@ function getTableSqlString(table, arr) {
 
 const student = getTableSqlString("student", ["count.id", "string.about", "string.email", "string.fullname", "string.nickname"]);
 const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
+const thread = getTableSqlString("thread", ["count.id", "string.author_nickname", "int.author_id", "time.created", "string.forum_slug", "int.forum_id", "string.message", "string.slug", "string.title", "int.votes"]);
+const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
 
 function dropIndexes() {
     const buffer = [];
     const number = 10;
-    for(let i = 0; i < 10; i++) {
+    for(let i = 0; i < 15; i++) {
         buffer.push(DROP_INDEX + i.toString() + ";");
     }
     const content = buffer.join("\n") + "\n";
@@ -70,6 +72,8 @@ const indexesDrop = dropIndexes();
 let tablesBuffer = [
     student,
     forum,
+    thread,
+    jointable,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
@@ -81,6 +85,9 @@ function createIndexes() {
         "INDEX **** ON student (LOWER(student_nickname))",
         "UNIQUE INDEX **** ON forum (LOWER(forum_slug))",
         "INDEX **** ON forum (LOWER(forum_slug))",
+        "UNIQUE INDEX **** ON thread (LOWER(thread_slug))",
+        "INDEX **** ON thread (LOWER(thread_slug))",
+        "UNIQUE INDEX **** ON jointable (jointable_forum_id, jointable_user_id)",
     ];
 
     for(let i = 0; i < buffer.length; i++) {

@@ -1,7 +1,5 @@
 "use strict";
 
-// User actions service
-
 function updateUserQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("UPDATE student SET student_id = student_id + 0");

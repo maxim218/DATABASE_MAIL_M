@@ -59,11 +59,13 @@ function getTableSqlString(table, arr) {
 
 const student = getTableSqlString("student", ["count.id", "string.about", "string.email", "string.fullname", "string.nickname"]);
 const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
+const thread = getTableSqlString("thread", ["count.id", "string.author_nickname", "int.author_id", "time.created", "string.forum_slug", "int.forum_id", "string.message", "string.slug", "string.title", "int.votes"]);
+const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
 
 function dropIndexes() {
     const buffer = [];
     const number = 10;
-    for(let i = 0; i < 10; i++) {
+    for(let i = 0; i < 15; i++) {
         buffer.push(DROP_INDEX + i.toString() + ";");
     }
     const content = buffer.join("\n") + "\n";
@@ -75,6 +77,8 @@ const indexesDrop = dropIndexes();
 let tablesBuffer = [
     student,
     forum,
+    thread,
+    jointable,
 ];
 
 const databaseTables = tablesBuffer.join("\n");
@@ -86,6 +90,9 @@ function createIndexes() {
         "INDEX **** ON student (LOWER(student_nickname))",
         "UNIQUE INDEX **** ON forum (LOWER(forum_slug))",
         "INDEX **** ON forum (LOWER(forum_slug))",
+        "UNIQUE INDEX **** ON thread (LOWER(thread_slug))",
+        "INDEX **** ON thread (LOWER(thread_slug))",
+        "UNIQUE INDEX **** ON jointable (jointable_forum_id, jointable_user_id)",
     ];
 
     for(let i = 0; i < buffer.length; i++) {
@@ -136,6 +143,7 @@ connectParamsObj["port"] =  PORT;
 const connectObj = new pg.Pool(connectParamsObj);
 
 function database(queryContentString) {
+    info("Query: " + queryContentString);
     return new Promise((resolve) => {
         connectObj.query(queryContentString, [], (err, ok) => {
             if (err) {
@@ -161,6 +169,9 @@ function answer(response, code, content) {
     response.end(content);
 }
 
+function makeCreated() {
+    return new Date().toISOString().toString();
+}
 
 
 
@@ -212,6 +223,65 @@ function addGetPostEvents() {
 
 addGetPostEvents();
 
+const NUMBERS = "1234567890";
+
+const NO = -1;
+
+function getYes() {
+    return true;
+}
+
+function getNo() {
+    return false;
+}
+
+function onlyNumbers(stringContentParam) {
+    for(let i = 0; i < stringContentParam.length; ++i) {
+        const stringElement = stringContentParam.charAt(i);
+        if(NUMBERS.indexOf(stringElement) === NO) {
+            return getNo();
+        }
+    }
+    return getYes();
+}
+
+const URL_SPLITTER = "&";
+const EQUAL_CHAR = "=";
+
+function wordsArray(stringContentParam) {
+    if(stringContentParam) {
+        const wordsObject = getObj();
+        const a = stringContentParam.split(URL_SPLITTER);
+        a.forEach((element) => {
+            const q = element.toString().split(EQUAL_CHAR);
+            const w1 = q[0];
+            const w2 = q[1];
+            wordsObject[w1] = decodeURIComponent(w2);
+        });
+        return wordsObject;
+    } else {
+        return {};
+    }
+}
+
+function getSince(argumentsArr) {
+    let since = null;
+    if(argumentsArr["since"]) {
+        since = argumentsArr["since"];
+    }
+    return since;
+}
+
+function getSort(argumentsArr) {
+    let sortingString = "ASC";
+    if(argumentsArr["desc"] === "true") {
+        sortingString = "DESC";
+    }
+    return sortingString;
+}
+
+
+
 
 
 
@@ -241,13 +311,20 @@ function getQuery(request, response) {
         return null;
     }
 
-    const parts = request.url.split(MAIN_SPLIT_CHAR);
+    const arr = request.url.split("?");
+    const a0 = arr[0].toString();
+    const a1 = arr[1].toString();
+
+    const parts = a0.split(MAIN_SPLIT_CHAR);
     const part_2 = parts[2];
     const part_3 = parts[3];
     const part_4 = parts[4];
 
+    const argumentsArr = wordsArray(a1);
+
     if(part_2 === "user" && part_4 === "profile") tryToGetInformationAboutUserInDatabase(request, response, part_3);
     if(part_2 === "forum" && part_4 === "details") tryToGetForumInformation(request, response, part_3);
+    if(part_2 === "forum" && part_4 === "threads") tryToGetForumThreadsList(request, response, part_3, argumentsArr);
 }
 
 function postQuery(request, response) {
@@ -269,6 +346,7 @@ function postQuery(request, response) {
 
         if(part_2 === "user" && part_4 === "create") tryToAddUserToDatabase(request, response, mainObj, part_3);
         if(part_2 === "user" && part_4 === "profile") tryToUpdateInformationAboutUser(request, response, mainObj, part_3);
+        if(part_2 === "forum" && part_4 === "create") tryToCreateThreadInForum(request, response, mainObj, part_3);
 
     });
 }
@@ -280,8 +358,6 @@ function postQuery(request, response) {
 // element 5
 
 "use strict";
-
-// User actions service
 
 function updateUserQuery(mainObj, part_3) {
     const buffer = [];
@@ -549,4 +625,211 @@ function tryToGetForumInformation(request, response, part_3) {
                 }));
             }
         })
+}
+
+
+
+
+
+// ********************************
+// element 7
+
+"use strict";
+
+let threadCounter = 42;
+
+function tryToGetOneStudentForThread(mainObj) {
+    const buffer = [];
+    buffer.push("SELECT student_id, student_nickname FROM student");
+    buffer.push("WHERE LOWER(student_nickname) = LOWER('" + mainObj.author + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function tryToCreateThreadInForum(request, response, mainObj, part_3) {
+    database(tryToGetOneStudentForThread(mainObj))
+        .then((p) => {
+            if(!p.rows.length) {
+                answer(response, 404, str({
+                    message: mainObj.author,
+                }));
+            } else {
+                tryToCreateThreadInForumPartTwo(request, response, mainObj, part_3, {
+                    id: p.rows[0].student_id,
+                    nickname: p.rows[0].student_nickname,
+                });
+            }
+        });
+}
+
+function beSureExistsForumQuery(part_3) {
+    const buffer = [];
+    buffer.push("SELECT forum_id, forum_slug FROM forum");
+    buffer.push("WHERE LOWER(forum_slug) = LOWER('" + part_3 + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function tryToCreateThreadInForumPartTwo(request, response, mainObj, part_3, user) {
+    database(beSureExistsForumQuery(part_3))
+        .then((p) => {
+           if(!p.rows.length) {
+               answer(response, 404, str({
+                   message: part_3,
+               }));
+           } else {
+               tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, user, {
+                   id: p.rows[0].forum_id,
+                   slug: p.rows[0].forum_slug,
+               })
+           }
+        });
+}
+
+function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, user, forum) {
+    threadCounter++;
+
+    if(!mainObj.created) {
+        mainObj.created = makeCreated();
+    }
+
+    if(!mainObj.slug) {
+        mainObj.slug = threadCounter.toString();
+    }
+
+    const buffer = [];
+    buffer.push("INSERT INTO thread (thread_id, thread_author_nickname, thread_author_id, thread_created,");
+    buffer.push("thread_forum_slug, thread_forum_id, thread_message, thread_slug, thread_title, thread_votes)");
+    buffer.push("VALUES (");
+    const arr = [
+        threadCounter,
+        "'" + user.nickname + "'",
+        user.id,
+        "'" + mainObj.created + "'",
+        "'" + forum.slug + "'",
+        forum.id,
+        "'" + mainObj.message + "'",
+        "'" + mainObj.slug + "'",
+        "'" + mainObj.title + "'",
+        0,
+    ];
+    buffer.push(arr.join(","));
+    buffer.push(");");
+    const bufferStrQuery = buffer.join(" ");
+
+    database(bufferStrQuery)
+        .then((p) => {
+           if(p.err) {
+                database(getConflictThreadData(mainObj))
+                    .then((p) => {
+                        const thread = p.arr[0];
+                        const threadResult = {
+                            author: thread.thread_author_nickname,
+                            created: thread.thread_created,
+                            forum: thread.thread_forum_slug,
+                            id: thread.thread_id,
+                            message: thread.thread_message,
+                            title: thread.thread_title,
+                            votes: thread.thread_votes,
+                        };
+                        if(onlyNumbers(thread.thread_slug) === false) {
+                            threadResult.slug = thread.thread_slug;
+                        }
+                        answer(response, 409, str(threadResult));
+                    });
+           } else {
+               info("Insert Thread OK");
+               tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3, user, forum);
+           }
+        });
+}
+
+function getConflictThreadData(mainObj) {
+    const buffer = [];
+    buffer.push("SELECT * FROM thread");
+    buffer.push("WHERE LOWER(thread_slug) = LOWER('" + mainObj.slug + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function incrementOfPostNumberInForumQuery(forum) {
+    const buffer = [];
+    buffer.push("UPDATE forum SET");
+    buffer.push("forum_threads = forum_threads + 1");
+    buffer.push("WHERE forum_id = " +  forum.id + ";");
+    return buffer.join(" ");
+}
+
+function addToJoinTablePair(forum, user) {
+    const buffer = [];
+    buffer.push("INSERT INTO jointable");
+    buffer.push("(jointable_forum_id, jointable_user_id)");
+    buffer.push("VALUES(" + forum.id + "," +  user.id + ");");
+    return buffer.join(" ");
+}
+
+function tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3, user, forum) {
+    info("end function");
+    database(incrementOfPostNumberInForumQuery(forum))
+        .then((p1) => {
+            database(addToJoinTablePair(forum, user))
+                .then((p2) => {
+                   database(getConflictThreadData(mainObj))
+                       .then((p) => {
+                           info("BEGIN end of big function");
+                           const thread = p.rows[0];
+                           const threadResult = {
+                               author: thread.thread_author_nickname,
+                               created: thread.thread_created,
+                               forum: thread.thread_forum_slug,
+                               id: thread.thread_id,
+                               message: thread.thread_message,
+                               title: thread.thread_title,
+                               votes: thread.thread_votes,
+                           };
+                           if(onlyNumbers(thread.thread_slug) === false) {
+                               threadResult.slug = thread.thread_slug;
+                           }
+                           info("END end of big function");
+                           answer(response, 201, str(threadResult));
+                       });
+                });
+        });
+}
+
+function getInformationOneForumSlugId(part_3) {
+    const buffer = [];
+    buffer.push("SELECT forum_id, forum_slug FROM forum");
+    buffer.push("WHERE LOWER(forum_slug) = LOWER('" + part_3 + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
+    database(getInformationOneForumSlugId(part_3))
+        .then((p) => {
+           if(!p.rows.length) {
+               answer(response, 404, str({
+                   message: part_3,
+               }))
+           } else {
+               tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr, {
+                   id: p.rows[0].forum_id,
+                   slug: p.rows[0].forum_slug,
+               });
+           }
+        });
+}
+
+function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr, forum) {
+
+
+
+    const buffer = [];
+
+    buffer.push("SELECT * FROM thread");
+    buffer.push("WHERE thread_forum_id = " + forum.id + " ");
+
+
+
 }
