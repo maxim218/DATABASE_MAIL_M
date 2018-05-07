@@ -1,15 +1,15 @@
 {
-  "name": "maximDB",
-  "version": "1.0.0",
-  "description": "Kolotovkin Maxim Mail DataBase Project",
-  "main": "MAIN_RESULT_SCRIPT.js",
+  "name": "MAXIM_DB_MAIL_V_2",
+  "version": "1.2.3",
+  "description": "Kolotovkin Maxim Database Project",
+  "main": "index.js",
   "scripts": {
-    "prestart": "node mainCollector.js",
-    "start": "node MAIN_RESULT_SCRIPT.js",
+    "prestart": "node package.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Kolotovkin Maxim",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.3",
