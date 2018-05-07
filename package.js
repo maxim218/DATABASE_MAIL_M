@@ -7,7 +7,7 @@ const number = 8;
 /**********************************************/
 
 function generateInfoText(i) {
-    const s0 = "\n\n";
+    const s0 = "\n";
     const s1 = "// ********************************\n";
     const s2 = "// element " + i.toString();
     const s3 = "\n\n";
@@ -27,7 +27,7 @@ for(let i = 1; i <= number; i++) {
 }
 
 const resultFileName = "index.js";
-const space = "\n\n\n";
+const space = "\n";
 const content = buffer.join(space);
 
 fs.writeFileSync(resultFileName, content, 'utf8');

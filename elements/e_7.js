@@ -84,9 +84,10 @@ function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, u
     database(bufferStrQuery)
         .then((p) => {
            if(p.err) {
+                info("ERROR ERROR ERROR");
                 database(getConflictThreadData(mainObj))
                     .then((p) => {
-                        const thread = p.arr[0];
+                        const thread = p.rows[0];
                         const threadResult = {
                             author: thread.thread_author_nickname,
                             created: thread.thread_created,
@@ -99,6 +100,7 @@ function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, u
                         if(onlyNumbers(thread.thread_slug) === false) {
                             threadResult.slug = thread.thread_slug;
                         }
+                        info("SEND CONFLICT");
                         answer(response, 409, str(threadResult));
                     });
            } else {
