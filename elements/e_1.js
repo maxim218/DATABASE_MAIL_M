@@ -16,6 +16,7 @@ const DROP_INDEX = "DROP INDEX IF EXISTS index_";
 const MAIN_PORT = 5000;
 const ALLOW_ALL_PATH = '/*';
 const MAIN_SPLIT_CHAR = "/";
+const START_PARRENT_VALUE = 0;
 const ARR = " INTEGER [] DEFAULT ARRAY [0]";
 const SORT_TYPE_1 = "flat";
 const SORT_TYPE_2 = "tree";
