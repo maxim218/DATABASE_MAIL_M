@@ -62,7 +62,7 @@ const thread = getTableSqlString("thread", ["count.id", "string.author_nickname"
 const jointable = getTableSqlString("jointable", ["int.forum_id", "int.user_id"]);
 const post = getTableSqlString("post", ["count.id", "string.student_nickname", "int.student_id", "time.created",
         "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
-const vote = getTableSqlString("vote", ["string.nickname", "int.voice", "int.thread_id"]);
+const vote = getTableSqlString("vote", ["int.student_id", "int.voice", "int.thread_id"]);
 
 function dropIndexes() {
     const buffer = [];
@@ -97,6 +97,7 @@ function createIndexes() {
         "UNIQUE INDEX **** ON thread (LOWER(thread_slug))",
         "INDEX **** ON thread (LOWER(thread_slug))",
         "UNIQUE INDEX **** ON jointable (jointable_forum_id, jointable_user_id)",
+        "UNIQUE INDEX **** ON vote (vote_student_id, vote_thread_id)",
     ];
 
     for(let i = 0; i < buffer.length; i++) {
