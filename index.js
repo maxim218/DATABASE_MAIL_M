@@ -1009,6 +1009,13 @@ function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, 
         });
 }
 
+function getStudentsPathDataObj(commentsList) {
+    const buffer = [];
+    buffer.push("SELECT student_id, student_nickname FROM student");
+    buffer.push("WHERE LOWER(student_nickname) IN (" + getListStudentsPost(commentsList) + ");");
+    return buffer.join(" ");
+}
+
 function getListStudentsPost(commentsList) {
     const studentsLower = [];
     commentsList.forEach((comment) => {
@@ -1021,13 +1028,7 @@ function getListStudentsPost(commentsList) {
 
 function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     info("All parents exists");
-
-    const buffer = [];
-    buffer.push("SELECT student_id, student_nickname FROM student");
-    buffer.push("WHERE LOWER(student_nickname) IN (" + getListStudentsPost(commentsList) + ");");
-    const bufferStrQuery = buffer.join(" ");
-
-    database(bufferStrQuery)
+    database(getStudentsPathDataObj(commentsList))
         .then((p) => {
             const studentsExistsInDatabase = p.rows;
             let result = "YES";
