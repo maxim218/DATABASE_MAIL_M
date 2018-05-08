@@ -70,3 +70,64 @@ function tryUpdateBranchContent(mainObj, threadID) {
     return buffer.join(" ");
 }
 
+function getForumTheIDForGettingForumUsers(part_3) {
+    const buffer = [];
+    buffer.push("SELECT forum_id FROM forum");
+    buffer.push("WHERE LOWER(forum_slug) = LOWER('" + part_3 + "')");
+    buffer.push("LIMIT 1;");
+    return buffer.join(" ");
+}
+
+function tryToGetAllStudentsThatHaveBranchPrPostInTheForum(request, response, part_3, argumentsArr) {
+    database(getForumTheIDForGettingForumUsers(part_3))
+        .then((p) => {
+           if(!p.rows.length) {
+               answer(response, 404, str({
+                   message: part_3,
+               }));
+           } else {
+               const forumID = p.rows[0].forum_id;
+               tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, response, part_3, argumentsArr, forumID);
+           }
+        });
+}
+
+function tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, response, part_3, argumentsArr, forumID) {
+    const limit = getLimit(argumentsArr);
+    const type = getSort(argumentsArr);
+    const since = getSince(argumentsArr);
+    const buffer = [];
+    buffer.push("SELECT * FROM student");
+    buffer.push("INNER JOIN jointable ON");
+    buffer.push("student_id = jointable_user_id");
+    buffer.push("WHERE jointable_forum_id = " + forumID + " ");
+    if(since) {
+        buffer.push("AND LOWER(student_nickname)");
+        if(type === "ASC") {
+            buffer.push(" > ");
+        } else {
+            buffer.push(" < ");
+        }
+        buffer.push("LOWER('" + since + "')");
+    }
+    buffer.push("ORDER BY LOWER(student_nickname) " + type);
+    if(limit) {
+        buffer.push("LIMIT");
+        buffer.push(limit);
+    }
+    buffer.push(";");
+    const bufferStr = buffer.join(" ");
+    database(bufferStr)
+        .then((p) => {
+            const arr = [];
+            p.rows.forEach((element) => {
+                arr.push({
+                    about: element.student_about,
+                    email: element.student_email,
+                    fullname: element.student_fullname,
+                    nickname: element.student_nickname,
+                });
+            });
+            answer(response, 200, str(arr));
+        });
+}
