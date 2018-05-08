@@ -17,6 +17,9 @@ const MAIN_PORT = 5000;
 const ALLOW_ALL_PATH = '/*';
 const MAIN_SPLIT_CHAR = "/";
 const ARR = " INTEGER [] DEFAULT ARRAY [0]";
+const SORT_TYPE_1 = "flat";
+const SORT_TYPE_2 = "tree";
+const SORT_TYPE_3 = "parent_tree";
 
 console.log("*************************************\n\n");
 

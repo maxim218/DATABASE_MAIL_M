@@ -175,6 +175,7 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
                 comment.path = [];
                 makeDouble(comment.path, arr);
                 exists = true;
+                comment.path.push(comment.commentID);
             }
         });
 

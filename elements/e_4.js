@@ -35,6 +35,7 @@ function getQuery(request, response) {
     if(part_2 === "forum" && part_4 === "details") tryToGetForumInformation(request, response, part_3);
     if(part_2 === "forum" && part_4 === "threads") tryToGetForumThreadsList(request, response, part_3, argumentsArr);
     if(part_2 === "thread" && part_4 === "details") tryToGetFullInformationAboutOneThread(request, response, part_3);
+    if(part_2 === "thread" && part_4 === "posts") tryToGetListOfPostsFlatThreeParentThree(request, response, part_3, argumentsArr);
 }
 
 function postQuery(request, response) {
