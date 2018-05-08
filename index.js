@@ -1172,10 +1172,32 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
             const postNumberAll = commentsList.length;
 
             database(addPostsNumberInOneForumQuery(postNumberAll, thread))
-                .then((p) => {
-                    answer(response, 201, str(arr));
+                .then((p1) => {
+                    database(addingJoiningPairsForumStudent(commentsList, thread))
+                        .then((p2) => {
+                            answer(response, 201, str(arr));
+                        });
                 });
         });
+}
+
+function addingJoiningPairsForumStudent(commentsList, thread) {
+    const forum_id = thread.forumID;
+    const buffer = [];
+    commentsList.forEach((comment) => {
+        const student_id = comment.studentId;
+        const query = addToJoinTablePairAfterAddingPost(forum_id, student_id);
+        buffer.push(query);
+    });
+    return buffer.join(" ");
+}
+
+function addToJoinTablePairAfterAddingPost(forum_id, student_id) {
+    const buffer = [];
+    buffer.push("INSERT INTO jointable");
+    buffer.push("(jointable_forum_id, jointable_user_id)");
+    buffer.push("VALUES(" + forum_id + "," + student_id + ");");
+    return buffer.join(" ");
 }
 
 function addPostsNumberInOneForumQuery(postNumberAll, thread) {
