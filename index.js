@@ -343,6 +343,7 @@ function getQuery(request, response) {
     if(part_2 === "user" && part_4 === "profile") tryToGetInformationAboutUserInDatabase(request, response, part_3);
     if(part_2 === "forum" && part_4 === "details") tryToGetForumInformation(request, response, part_3);
     if(part_2 === "forum" && part_4 === "threads") tryToGetForumThreadsList(request, response, part_3, argumentsArr);
+    if(part_2 === "thread" && part_4 === "details") tryToGetFullInformationAboutOneThread(request, response, part_3);
 }
 
 function postQuery(request, response) {
@@ -1173,6 +1174,47 @@ function addPostsNumberInOneForumQuery(postNumberAll, thread) {
 // element 9
 
 "use strict";
+
+function tryToGetFullInformationAboutOneThread(request, response, part_3) {
+    const buffer = [];
+    buffer.push("SELECT * FROM thread");
+
+    const threadSlugId = part_3;
+
+    if(onlyNumbers(threadSlugId)) {
+        const id = parseInt(threadSlugId);
+        buffer.push("WHERE thread_id = " + id + " ");
+    } else {
+        const slug = threadSlugId.toString();
+        buffer.push("WHERE LOWER(thread_slug) = LOWER('" + slug + "') ");
+    }
+    buffer.push("LIMIT 1;");
+    const bufferStr = buffer.join(" ");
+
+    database(bufferStr)
+        .then((p) => {
+            if(!p.rows.length) {
+                answer(response, 404, str({
+                    message: threadSlugId,
+                }))
+            } else {
+                const thread = p.rows[0];
+                const threadResult = {
+                    author: thread.thread_author_nickname,
+                    created: thread.thread_created,
+                    forum: thread.thread_forum_slug,
+                    id: thread.thread_id,
+                    message: thread.thread_message,
+                    title: thread.thread_title,
+                    votes: thread.thread_votes,
+                };
+                if(onlyNumbers(thread.thread_slug) === false) {
+                    threadResult.slug = thread.thread_slug;
+                }
+                answer(response, 200, str(threadResult));
+            }
+        });
+}
 
 function controlThreadParamsSlugAndIdParamForMakingVotes(threadSlugId, continueMethod) {
     const buffer = [];
