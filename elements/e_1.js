@@ -76,7 +76,7 @@ const vote = getTableSqlString("vote", ["int.student_id", "int.voice", "int.thre
 function dropIndexes() {
     const buffer = [];
     const number = 10;
-    for(let i = 0; i < 15; i++) {
+    for(let i = 0; i < 30; i++) {
         buffer.push(DROP_INDEX + i.toString() + ";");
     }
     const content = buffer.join("\n") + "\n";

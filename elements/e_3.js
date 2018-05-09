@@ -2,6 +2,20 @@
 
 let application = require("express")();
 
+function printGetQueryInfo(request) {
+    info("\n");
+    info("************************************");
+    info("method ** GET");
+    info("path ** " + request.url);
+}
+
+function printPostQueryInfoPost(request) {
+    info("\n");
+    info("************************************");
+    info("method ^^ POST");
+    info("path ^^ " + request.url);
+}
+
 function allowAll(response) {
     response.header("Access-Control-Allow-Origin", "*");
 }
@@ -21,22 +35,23 @@ function startMainServer() {
 
 startMainServer();
 
-function addGetPostEvents() {
+function incGetEvent(application) {
     application.get(ALLOW_ALL_PATH, (request, response) => {
-        info("\n");
-        info("************************************");
-        info("method: GET");
-        info("path: " + request.url);
+        printGetQueryInfo(request);
         getQuery(request, response);
     });
+}
 
+function incPostEvent(application) {
     application.post(ALLOW_ALL_PATH, (request, response) => {
-        info("\n");
-        info("************************************");
-        info("method: POST");
-        info("path: " + request.url);
+        printPostQueryInfoPost(request);
         postQuery(request, response);
     });
+}
+
+function addGetPostEvents() {
+    incGetEvent(application);
+    incPostEvent(application);
 }
 
 addGetPostEvents();
