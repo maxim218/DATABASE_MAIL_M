@@ -1,7 +1,7 @@
 "use strict";
 
 function info(information) {
-    console.log(information);
+    // console.log(information);
 }
 
 function str(obj) {
