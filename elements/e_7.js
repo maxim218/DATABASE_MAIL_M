@@ -227,7 +227,7 @@ function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr
 
                 arr.push(thread);
             });
-
+            info("Get threads of forum !!!!!!");
             answer(response, 200, str(arr));
         });
 }

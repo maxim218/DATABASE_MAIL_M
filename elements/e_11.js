@@ -128,6 +128,7 @@ function tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, respo
                     nickname: element.student_nickname,
                 });
             });
+            info("Get forum users )))) ((((");
             answer(response, 200, str(arr));
         });
 }

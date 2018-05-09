@@ -102,12 +102,20 @@ function createIndexes() {
         "UNIQUE INDEX **** ON student (LOWER(student_email))",
         "UNIQUE INDEX **** ON student (LOWER(student_nickname))",
         "INDEX **** ON student (LOWER(student_nickname))",
+        "INDEX **** ON student (LOWER(student_nickname), student_id)",
         "UNIQUE INDEX **** ON forum (LOWER(forum_slug))",
         "INDEX **** ON forum (LOWER(forum_slug))",
         "UNIQUE INDEX **** ON thread (LOWER(thread_slug))",
         "INDEX **** ON thread (LOWER(thread_slug))",
+        "INDEX **** ON thread (LOWER(thread_slug), thread_id)",
         "UNIQUE INDEX **** ON jointable (jointable_forum_id, jointable_user_id)",
         "UNIQUE INDEX **** ON vote (vote_student_id, vote_thread_id)",
+        "INDEX **** ON vote (vote_student_id, vote_thread_id, vote_voice)",
+
+        "INDEX **** ON thread (LOWER(thread_slug), thread_id, thread_slug, thread_forum_slug, thread_forum_id)",
+        "INDEX **** ON thread (thread_id, thread_slug, thread_forum_slug, thread_forum_id)",
+        "INDEX **** ON post (post_thread_id, post_id, post_main_array)",
+        "INDEX **** ON student (LOWER(student_nickname), student_id, student_nickname)",
     ];
 
     for(let i = 0; i < buffer.length; i++) {
