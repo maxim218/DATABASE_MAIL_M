@@ -23,6 +23,7 @@ const THREAD = "thread";
 const COMMENT = "post";
 const STUDENT = "student";
 const OK = 200;
+const TIMER_WAIT_TIME_PARAM = 1;
 const SORT_TYPE_1 = "flat";
 const SORT_TYPE_2 = "tree";
 const SORT_TYPE_3 = "parent_tree";
