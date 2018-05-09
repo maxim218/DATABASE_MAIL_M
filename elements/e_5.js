@@ -1,5 +1,39 @@
 "use strict";
 
+function getCountOfTheElementByTableName(tableName) {
+    const buffer = [];
+    buffer.push("SELECT COUNT(*)");
+    buffer.push("AS value FROM");
+    buffer.push(tableName);
+    buffer.push(";");
+    return buffer.join(" ");
+}
+
+function getIntegerByZeroValue(element) {
+    return parseInt(element.rows[0].value);
+}
+
+function functionGetNumberCountOfStudentForumPostThreadSevice(request, response) {
+    const buffer = getObj();
+    database(getCountOfTheElementByTableName(FORUM))
+        .then((forum) => {
+            buffer.forum = getIntegerByZeroValue(forum);
+            database(getCountOfTheElementByTableName(THREAD))
+                .then((thread) => {
+                    buffer.thread = getIntegerByZeroValue(thread);
+                    database(getCountOfTheElementByTableName(COMMENT))
+                        .then((post) => {
+                            buffer.post = getIntegerByZeroValue(post);
+                            database(getCountOfTheElementByTableName(STUDENT))
+                                .then((user) => {
+                                    buffer.user = getIntegerByZeroValue(user);
+                                    answer(response, OK, str(buffer));
+                                })
+                        });
+                });
+        });
+}
+
 function updateUserQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("UPDATE student SET student_id = student_id + 0");

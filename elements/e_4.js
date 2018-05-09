@@ -20,6 +20,11 @@ function getQuery(request, response) {
         return null;
     }
 
+    if(request.url === "/api/service/status") {
+        functionGetNumberCountOfStudentForumPostThreadSevice(request, response);
+        return null;
+    }
+
     const arr = request.url.split("?");
     const a0 = arr[0] + "";
     const a1 = arr[1] + "";
@@ -37,9 +42,20 @@ function getQuery(request, response) {
     if(part_2 === "thread" && part_4 === "details") tryToGetFullInformationAboutOneThread(request, response, part_3);
     if(part_2 === "thread" && part_4 === "posts") tryToGetListOfPostsFlatThreeParentThree(request, response, part_3, argumentsArr);
     if(part_2 === "forum" && part_4 === "users") tryToGetAllStudentsThatHaveBranchPrPostInTheForum(request, response, part_3, argumentsArr);
+    if(part_2 === "post" && part_4 === "details") tryToGetInformationAboutOnePostSimple(request, response, part_3, argumentsArr);
 }
 
 function postQuery(request, response) {
+    if(request.url === "/api/service/clear") {
+        database(result)
+            .then((p) => {
+                answer(response, 200, str({
+                    message: "welcome service",
+                }));
+            });
+        return null;
+    }
+
     const dataArr = [];
     request.on('data', (data) => {
         dataArr.push(data.toString());
@@ -62,7 +78,7 @@ function postQuery(request, response) {
         if(part_2 === "thread" && part_4 === "create") tryToAddBigListOfPosts(request, response, mainObj, part_3);
         if(part_2 === "thread" && part_4 === "vote") tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3);
         if(part_2 === "thread" && part_4 === "details") tryToUpdateMessageOrTitleOfTheThread(request, response, mainObj, part_3);
-
+        if(part_2 === "post" && part_4 === "details") tryToUpdatePostMessageInComment(request, response, mainObj, part_3);
 
     });
 }
