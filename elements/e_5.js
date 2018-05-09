@@ -1,18 +1,5 @@
 "use strict";
 
-function getCountOfTheElementByTableName(tableName) {
-    const buffer = [];
-    buffer.push("SELECT COUNT(*)");
-    buffer.push("AS value FROM");
-    buffer.push(tableName);
-    buffer.push(";");
-    return buffer.join(" ");
-}
-
-function getIntegerByZeroValue(element) {
-    return parseInt(element.rows[0].value);
-}
-
 function functionGetNumberCountOfStudentForumPostThreadSevice(request, response) {
     const buffer = getObj();
     database(getCountOfTheElementByTableName(FORUM))
@@ -32,6 +19,19 @@ function functionGetNumberCountOfStudentForumPostThreadSevice(request, response)
                         });
                 });
         });
+}
+
+function getCountOfTheElementByTableName(tableName) {
+    const buffer = [];
+    buffer.push("SELECT COUNT(*)");
+    buffer.push("AS value FROM");
+    buffer.push(tableName);
+    buffer.push(";");
+    return buffer.join(" ");
+}
+
+function getIntegerByZeroValue(element) {
+    return parseInt(element.rows[0].value);
 }
 
 function updateUserQuery(mainObj, part_3) {
@@ -197,5 +197,5 @@ function tryToAddUserToDatabase(request, response, mainObj, part_3) {
                     nickname: part_3,
                 }));
             }
-        })
+        });
 }

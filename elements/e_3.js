@@ -112,4 +112,6 @@ function makeDouble(resultArray, buffer) {
     });
 }
 
-
+function includeString(bigString, littleString) {
+    return bigString.indexOf(littleString) !== NO;
+}

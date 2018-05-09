@@ -313,7 +313,9 @@ function makeDouble(resultArray, buffer) {
     });
 }
 
-
+function includeString(bigString, littleString) {
+    return bigString.indexOf(littleString) !== NO;
+}
 
 
 
@@ -411,19 +413,6 @@ function postQuery(request, response) {
 
 "use strict";
 
-function getCountOfTheElementByTableName(tableName) {
-    const buffer = [];
-    buffer.push("SELECT COUNT(*)");
-    buffer.push("AS value FROM");
-    buffer.push(tableName);
-    buffer.push(";");
-    return buffer.join(" ");
-}
-
-function getIntegerByZeroValue(element) {
-    return parseInt(element.rows[0].value);
-}
-
 function functionGetNumberCountOfStudentForumPostThreadSevice(request, response) {
     const buffer = getObj();
     database(getCountOfTheElementByTableName(FORUM))
@@ -443,6 +432,19 @@ function functionGetNumberCountOfStudentForumPostThreadSevice(request, response)
                         });
                 });
         });
+}
+
+function getCountOfTheElementByTableName(tableName) {
+    const buffer = [];
+    buffer.push("SELECT COUNT(*)");
+    buffer.push("AS value FROM");
+    buffer.push(tableName);
+    buffer.push(";");
+    return buffer.join(" ");
+}
+
+function getIntegerByZeroValue(element) {
+    return parseInt(element.rows[0].value);
 }
 
 function updateUserQuery(mainObj, part_3) {
@@ -608,7 +610,7 @@ function tryToAddUserToDatabase(request, response, mainObj, part_3) {
                     nickname: part_3,
                 }));
             }
-        })
+        });
 }
 
 
@@ -1932,8 +1934,75 @@ function tryToGetInformationAboutOnePostSimplePartTwo(request, response, postID,
         }));
     } else {
         info("Related exists");
-        ////////////////////////////////
-        ////////////////////////////////
-        ////////////////////////////////
+        const related = argumentsArr["related"].toString();
+        const postResult = {
+            author: null,
+            forum: null,
+            post: null,
+            thread: null,
+        };
+        const comment = post;
+        postResult.post = {
+            author: comment.post_student_nickname,
+            created: comment.post_created,
+            forum: comment.post_forum_slug,
+            id: comment.post_id,
+            isEdited: comment.post_is_edited,
+            message: comment.post_message,
+            parent: comment.post_parent,
+            thread: comment.post_thread_id,
+        };
+
+        const buffer = [];
+        buffer.push("SELECT * FROM post");
+        buffer.push("INNER JOIN student ON student_id = post_student_id");
+        buffer.push("INNER JOIN forum ON forum_id = post_forum_id");
+        buffer.push("INNER JOIN thread ON thread_id = post_thread_id");
+        buffer.push("WHERE post_id = " + postID + " ");
+        buffer.push("LIMIT 1;");
+        const bufferStr = buffer.join(" ");
+        database(bufferStr)
+            .then((p) => {
+                const bigObj = p.rows[0];
+
+                if(includeString(related, "user")) {
+                    const element = bigObj;
+                    postResult.author = {
+                        about: element.student_about,
+                        email: element.student_email,
+                        fullname: element.student_fullname,
+                        nickname: element.student_nickname,
+                    }
+                }
+
+                if(includeString(related, "thread")) {
+                    const thread = bigObj;
+                    postResult.thread = {
+                        author: thread.thread_author_nickname,
+                        created: thread.thread_created,
+                        forum: thread.thread_forum_slug,
+                        id: thread.thread_id,
+                        message: thread.thread_message,
+                        title: thread.thread_title,
+                        votes: thread.thread_votes,
+                    };
+                    if(!onlyNumbers(thread.thread_slug)) {
+                        postResult.thread.slug = thread.thread_slug;
+                    }
+                }
+
+                if(includeString(related, "forum")) {
+                    const data = bigObj;
+                    postResult.forum = {
+                        posts: data.forum_posts,
+                        slug: data.forum_slug,
+                        threads: data.forum_threads,
+                        title: data.forum_title,
+                        user: data.forum_nickname,
+                    }
+                }
+
+                answer(response, 200, str(postResult));
+            });
     }
 }
