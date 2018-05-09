@@ -274,6 +274,9 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
                 .then((p1) => {
                     database(addingJoiningPairsForumStudent(commentsList, thread))
                         .then((p2) => {
+                            if(p2.err) {
+                                throw new Error();
+                            }
                             answer(response, 201, str(arr));
                         });
                 });
@@ -295,7 +298,7 @@ function addToJoinTablePairAfterAddingPost(forum_id, student_id) {
     const buffer = [];
     buffer.push("INSERT INTO jointable");
     buffer.push("(jointable_forum_id, jointable_user_id)");
-    buffer.push("VALUES(" + forum_id + "," + student_id + ");");
+    buffer.push("VALUES(" + forum_id + "," + student_id + ") ON CONFLICT DO NOTHING;");
     return buffer.join(" ");
 }
 

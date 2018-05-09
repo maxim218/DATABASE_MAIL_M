@@ -1,9 +1,5 @@
 "use strict";
 
-function info(information) {
-    // console.log(information);
-}
-
 function str(obj) {
     return JSON.stringify(obj);
 }

@@ -1,5 +1,9 @@
 "use strict";
 
+function info(information) {
+    console.log(information);
+}
+
 const COUNT = " SERIAL PRIMARY KEY";
 const STRING = ' TEXT COLLATE "ucs_basic"';
 const INT = " INTEGER";
