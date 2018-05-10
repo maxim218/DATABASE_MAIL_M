@@ -501,18 +501,8 @@ function postQueryExe(request, response, mainObj) {
         const part_3 = parts[3];
         const part_4 = parts[4];
 
-        if (twoPartsService(part_2, "user", part_4, "create")) {
-            tryToAddUserToDatabase(request, response, mainObj, part_3);
-            return null;
-        }
-
-        if (twoPartsService(part_2, "user", part_4, "profile")) {
-            tryToUpdateInformationAboutUser(request, response, mainObj, part_3);
-            return null;
-        }
-
-        if (twoPartsService(part_2, "forum", part_4, "create")) {
-            tryToCreateThreadInForum(request, response, mainObj, part_3);
+        if (twoPartsService(part_2, "thread", part_4, "vote")) {
+            tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3);
             return null;
         }
 
@@ -521,8 +511,18 @@ function postQueryExe(request, response, mainObj) {
             return null;
         }
 
-        if (twoPartsService(part_2, "thread", part_4, "vote")) {
-            tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3);
+        if (twoPartsService(part_2, "forum", part_4, "create")) {
+            tryToCreateThreadInForum(request, response, mainObj, part_3);
+            return null;
+        }
+
+        if (twoPartsService(part_2, "user", part_4, "create")) {
+            tryToAddUserToDatabase(request, response, mainObj, part_3);
+            return null;
+        }
+
+        if (twoPartsService(part_2, "user", part_4, "profile")) {
+            tryToUpdateInformationAboutUser(request, response, mainObj, part_3);
             return null;
         }
 
