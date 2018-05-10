@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ */
 function functionGetNumberCountOfStudentForumPostThreadSevice(request, response) {
     const buffer = getObj();
     database(getCountOfTheElementByTableName(FORUM))
@@ -21,6 +26,11 @@ function functionGetNumberCountOfStudentForumPostThreadSevice(request, response)
         });
 }
 
+/**
+ *
+ * @param tableName
+ * @returns {string}
+ */
 function getCountOfTheElementByTableName(tableName) {
     const buffer = [];
     buffer.push("SELECT COUNT(*)");
@@ -30,10 +40,21 @@ function getCountOfTheElementByTableName(tableName) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param element
+ * @returns {number}
+ */
 function getIntegerByZeroValue(element) {
     return parseInt(element.rows[0].value);
 }
 
+/**
+ *
+ * @param mainObj
+ * @param part_3
+ * @returns {string}
+ */
 function updateUserQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("UPDATE student SET student_id = student_id + 0");
@@ -51,6 +72,11 @@ function updateUserQuery(mainObj, part_3) {
     return part;
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function selectOneUserQuery(part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM student");
@@ -59,6 +85,11 @@ function selectOneUserQuery(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param p
+ * @returns {*}
+ */
 function getOneStudentFromArr(p) {
     const arr = [];
     p.rows.forEach((element) => {
@@ -72,6 +103,13 @@ function getOneStudentFromArr(p) {
     return arr[0];
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToUpdateInformationAboutUserAfterControlUserExists(request, response, mainObj, part_3) {
     const part = updateUserQuery(mainObj, part_3);
     database(part)
@@ -90,6 +128,11 @@ function tryToUpdateInformationAboutUserAfterControlUserExists(request, response
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getStudentCountFromArr(part_3) {
     const buffer = [];
     buffer.push("SELECT COUNT(*) FROM student WHERE");
@@ -97,6 +140,13 @@ function getStudentCountFromArr(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToUpdateInformationAboutUser(request, response, mainObj, part_3) {
     database(getStudentCountFromArr(part_3))
         .then((p) => {
@@ -111,6 +161,11 @@ function tryToUpdateInformationAboutUser(request, response, mainObj, part_3) {
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getOneStudentFromArray(part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM student WHERE");
@@ -119,6 +174,11 @@ function getOneStudentFromArray(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param p
+ * @param response
+ */
 function getInfoOneStudentFromArr(p, response) {
     const arr = [];
     p.rows.forEach((element) => {
@@ -132,6 +192,12 @@ function getInfoOneStudentFromArr(p, response) {
     answer(response, 200, str(arr[0]));
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ */
 function tryToGetInformationAboutUserInDatabase(request, response, part_3) {
     database(getOneStudentFromArray(part_3))
         .then((p) => {
@@ -145,6 +211,12 @@ function tryToGetInformationAboutUserInDatabase(request, response, part_3) {
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param part_3
+ * @returns {string}
+ */
 function insertStudentQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("INSERT INTO student (student_about, student_email, ");
@@ -158,6 +230,12 @@ function insertStudentQuery(mainObj, part_3) {
     return buffer.join("");
 }
 
+/**
+ *
+ * @param mainObj
+ * @param part_3
+ * @returns {string}
+ */
 function getConflictStudentsQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM student WHERE ");
@@ -168,6 +246,11 @@ function getConflictStudentsQuery(mainObj, part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param p
+ * @param response
+ */
 function sendConflictStudents(p, response) {
     const arr = [];
     p.rows.forEach((element) => {
@@ -181,6 +264,13 @@ function sendConflictStudents(p, response) {
     answer(response, 409, str(arr));
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToAddUserToDatabase(request, response, mainObj, part_3) {
     database(insertStudentQuery(mainObj, part_3) )
         .then((p) => {

@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getTheOneStudentQuery(mainObj) {
     const buffer = [];
     buffer.push("SELECT student_nickname FROM student WHERE");
@@ -8,6 +13,12 @@ function getTheOneStudentQuery(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ */
 function tryToAddNewForumOfStudentToDatabase(request, response, mainObj) {
     database(getTheOneStudentQuery(mainObj))
         .then((p) => {
@@ -21,6 +32,12 @@ function tryToAddNewForumOfStudentToDatabase(request, response, mainObj) {
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param student
+ * @returns {string}
+ */
 function addStudentForumInDatabaseQuery(mainObj, student) {
     const buffer = [];
     buffer.push("INSERT INTO forum");
@@ -29,6 +46,11 @@ function addStudentForumInDatabaseQuery(mainObj, student) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getObjOneForumOfStudentQuery(mainObj) {
     const buffer = [];
     buffer.push("SELECT * FROM forum");
@@ -37,6 +59,13 @@ function getObjOneForumOfStudentQuery(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param student
+ */
 function insertForumOfStudentToDatabase(request, response, mainObj, student) {
     database(addStudentForumInDatabaseQuery(mainObj, student))
         .then((p) => {
@@ -65,6 +94,11 @@ function insertForumOfStudentToDatabase(request, response, mainObj, student) {
         })
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function tryOneForumBySlugValue(part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM forum");
@@ -73,6 +107,12 @@ function tryOneForumBySlugValue(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ */
 function tryToGetForumInformation(request, response, part_3) {
     database(tryOneForumBySlugValue(part_3))
         .then((p) => {

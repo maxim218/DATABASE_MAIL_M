@@ -1,9 +1,19 @@
 "use strict";
 
+/**
+ * get array (for debug)
+ * @returns {Array}
+ */
 function getEmptyArray() {
     return [];
 }
 
+/**
+ * catch Get queries and call functions
+ * @param request
+ * @param response
+ * @returns {null}
+ */
 function getQuery(request, response) {
     if(request.url === "/api") {
         if(databaseCreated === false) {
@@ -74,9 +84,16 @@ function getQuery(request, response) {
     }
 }
 
+// queue
 let arrGlobal = getEmptyArray();
 let emptyProc = true;
 
+/**
+ * push the query to queue
+ * @param request
+ * @param response
+ * @param bodyObj
+ */
 function pushQueryInformationToGlobalArr(request, response, bodyObj) {
     const resObj = {
         request: request,
@@ -104,7 +121,11 @@ setInterval(() => {
     }
 }, TIMER_WAIT_TIME_PARAM);
 
-
+/**
+ * catch Post query and save it to queue
+ * @param request
+ * @param response
+ */
 function postQuery(request, response) {
     if(request.url === "/api/service/clear") {
         pushQueryInformationToGlobalArr(request, response, getObj());
@@ -119,6 +140,13 @@ function postQuery(request, response) {
     }
 }
 
+/**
+ * catch Post queries and call functions
+ * @param request
+ * @param response
+ * @param mainObj
+ * @returns {null}
+ */
 function postQueryExe(request, response, mainObj) {
     if(mainObj) {
         if (request.url === "/api/service/clear") {

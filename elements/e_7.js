@@ -2,6 +2,11 @@
 
 let threadCounter = 42;
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function tryToGetOneStudentForThread(mainObj) {
     const buffer = [];
     buffer.push("SELECT student_id, student_nickname FROM student");
@@ -10,6 +15,13 @@ function tryToGetOneStudentForThread(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToCreateThreadInForum(request, response, mainObj, part_3) {
     database(tryToGetOneStudentForThread(mainObj))
         .then((p) => {
@@ -26,6 +38,11 @@ function tryToCreateThreadInForum(request, response, mainObj, part_3) {
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function beSureExistsForumQuery(part_3) {
     const buffer = [];
     buffer.push("SELECT forum_id, forum_slug FROM forum");
@@ -34,6 +51,14 @@ function beSureExistsForumQuery(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param user
+ */
 function tryToCreateThreadInForumPartTwo(request, response, mainObj, part_3, user) {
     database(beSureExistsForumQuery(part_3))
         .then((p) => {
@@ -50,6 +75,15 @@ function tryToCreateThreadInForumPartTwo(request, response, mainObj, part_3, use
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param user
+ * @param forum
+ */
 function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, user, forum) {
     threadCounter++;
 
@@ -110,6 +144,11 @@ function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, u
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getConflictThreadData(mainObj) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -118,6 +157,11 @@ function getConflictThreadData(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param forum
+ * @returns {string}
+ */
 function incrementOfPostNumberInForumQuery(forum) {
     const buffer = [];
     buffer.push("UPDATE forum SET");
@@ -126,6 +170,12 @@ function incrementOfPostNumberInForumQuery(forum) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param forum
+ * @param user
+ * @returns {string}
+ */
 function addToJoinTablePair(forum, user) {
     const buffer = [];
     buffer.push("INSERT INTO jointable");
@@ -134,6 +184,15 @@ function addToJoinTablePair(forum, user) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param user
+ * @param forum
+ */
 function tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3, user, forum) {
     info("end function");
     database(incrementOfPostNumberInForumQuery(forum))
@@ -163,6 +222,11 @@ function tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getInformationOneForumSlugId(part_3) {
     const buffer = [];
     buffer.push("SELECT forum_id, forum_slug FROM forum");
@@ -171,6 +235,13 @@ function getInformationOneForumSlugId(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ */
 function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
     database(getInformationOneForumSlugId(part_3))
         .then((p) => {
@@ -187,6 +258,14 @@ function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ * @param forum
+ */
 function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr, forum) {
     const since = getSince(argumentsArr);
     const vector = getSort(argumentsArr);
