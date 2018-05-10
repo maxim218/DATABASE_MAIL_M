@@ -1,9 +1,19 @@
 "use strict";
 
+/**
+ * get JSON string from simple object
+ * @param obj
+ * @returns {string}
+ */
 function str(obj) {
     return JSON.stringify(obj);
 }
 
+/**
+ * get object from JSON string (for parsing body of query from client)
+ * @param string
+ * @returns {any}
+ */
 function obj(string) {
     return JSON.parse(string);
 }
@@ -11,6 +21,8 @@ function obj(string) {
 const pg = require('pg');
 
 const connectParamsObj = {};
+
+// params for database
 
 connectParamsObj["user"] = USER;
 connectParamsObj["host"] = HOST;
@@ -20,6 +32,11 @@ connectParamsObj["port"] =  PORT;
 
 const connectObj = new pg.Pool(connectParamsObj);
 
+/**
+ * send SQL query to database
+ * @param queryContentString
+ * @returns {Promise<any>}
+ */
 function database(queryContentString) {
     info("Query: " + queryContentString);
     return new Promise((resolve) => {
@@ -40,6 +57,12 @@ function database(queryContentString) {
     });
 }
 
+/**
+ * send result to client
+ * @param response
+ * @param code
+ * @param content
+ */
 function answer(response, code, content) {
     info("code: " + code);
     info("result: " + content);
@@ -47,6 +70,10 @@ function answer(response, code, content) {
     response.end(content);
 }
 
+/**
+ * get date in timestamp with zone format
+ * @returns {string}
+ */
 function makeCreated() {
     return new Date().toISOString().toString();
 }

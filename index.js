@@ -5,8 +5,9 @@
 
 "use strict";
 
-function info(information) {
-    //    console.log(information);
+function info() {
+    // empty method
+    // was used for printing
 }
 
 const COUNT = " SERIAL PRIMARY KEY";
@@ -148,6 +149,15 @@ const indexesCreate = createIndexes();
 
 const result = indexesDrop.toString() + "\n" + databaseTables.toString() + "\n" + indexesCreate.toString();
 console.log(result);
+
+let databaseCreated = false;
+
+function twoPartsService(part_2, value_2, part_4, value_4) {
+    if(part_2 !== value_2) {
+        return false;
+    }
+    return part_4 === value_4;
+}
 
 function getObj() {
     return {};
@@ -356,15 +366,6 @@ function includeString(bigString, littleString) {
 
 "use strict";
 
-let databaseCreated = false;
-
-function twoPartsService(part_2, value_2, part_4, value_4) {
-    if(part_2 !== value_2) {
-        return false;
-    }
-    return part_4 === value_4;
-}
-
 function getEmptyArray() {
     return [];
 }
@@ -438,9 +439,6 @@ function getQuery(request, response) {
         return null;
     }
 }
-
-///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
-///////////////////////////////////////// ############################# $$$$$$$$$$$$$$$$$$$$$
 
 let arrGlobal = getEmptyArray();
 let emptyProc = true;

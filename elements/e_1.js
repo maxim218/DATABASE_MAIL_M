@@ -1,8 +1,14 @@
 "use strict";
 
-function info(information) {
-    //    console.log(information);
+/**
+ * print text information for debugging project
+ */
+function info() {
+    // empty method
+    // was used for printing
 }
+
+// init main constants
 
 const COUNT = " SERIAL PRIMARY KEY";
 const STRING = ' TEXT COLLATE "ucs_basic"';
@@ -34,6 +40,12 @@ const SORT_TYPE_3 = "parent_tree";
 
 console.log("*************************************\n\n");
 
+/**
+ * generate code of SQL table
+ * @param table
+ * @param arr
+ * @returns {string}
+ */
 function getTableSqlString(table, arr) {
     const buffer = [];
     const beginString = "    " + table + "_";
@@ -70,6 +82,8 @@ function getTableSqlString(table, arr) {
     return h1 + "\n" + h2 + "\n" + h3 + "\n" + h4 + "\n" + h5 + "\n";
 }
 
+// create tables of database
+
 const student = getTableSqlString("student", ["count.id", "string.about", "string.email", "string.fullname", "string.nickname"]);
 const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
 const thread = getTableSqlString("thread", ["count.id", "string.author_nickname", "int.author_id", "time.created", "string.forum_slug", "int.forum_id", "string.message", "string.slug", "string.title", "int.votes"]);
@@ -78,6 +92,10 @@ const post = getTableSqlString("post", ["count.id", "string.student_nickname", "
         "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
 const vote = getTableSqlString("vote", ["int.student_id", "int.voice", "int.thread_id"]);
 
+/**
+ * generate code for delete old indexes
+ * @returns {string}
+ */
 function dropIndexes() {
     const buffer = [];
     const number = 10;
@@ -101,6 +119,10 @@ let tablesBuffer = [
 
 const databaseTables = tablesBuffer.join("\n");
 
+/**
+ * generate code of all indexes to accelerate database working
+ * @returns {string}
+ */
 function createIndexes() {
     const buffer = [
         "UNIQUE INDEX **** ON student (LOWER(student_email))",
@@ -144,6 +166,27 @@ const indexesCreate = createIndexes();
 const result = indexesDrop.toString() + "\n" + databaseTables.toString() + "\n" + indexesCreate.toString();
 console.log(result);
 
+let databaseCreated = false;
+
+/**
+ * help to parse url content
+ * @param part_2
+ * @param value_2
+ * @param part_4
+ * @param value_4
+ * @returns {boolean}
+ */
+function twoPartsService(part_2, value_2, part_4, value_4) {
+    if(part_2 !== value_2) {
+        return false;
+    }
+    return part_4 === value_4;
+}
+
+/**
+ * get empty object
+ * @returns {{}}
+ */
 function getObj() {
     return {};
 }
