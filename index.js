@@ -86,7 +86,7 @@ const vote = getTableSqlString("vote", ["int.student_id", "int.voice", "int.thre
 function dropIndexes() {
     const buffer = [];
     const number = 10;
-    for(let i = 0; i < 30; i++) {
+    for(let i = 0; i < 50; i++) {
         buffer.push(DROP_INDEX + i.toString() + ";");
     }
     const content = buffer.join("\n") + "\n";
@@ -125,6 +125,17 @@ function createIndexes() {
         "INDEX **** ON thread (thread_id, thread_slug, thread_forum_slug, thread_forum_id)",
         "INDEX **** ON post (post_thread_id, post_id, post_main_array)",
         "INDEX **** ON student (LOWER(student_nickname), student_id, student_nickname)",
+
+        "INDEX **** ON thread (thread_forum_id, thread_created)",
+        "INDEX **** ON jointable (jointable_forum_id)",
+
+        "INDEX **** ON post (post_thread_id)",
+        "INDEX **** ON post (post_thread_id, post_id)",
+        "INDEX **** ON post (post_thread_id, post_main_array)",
+        "INDEX **** ON post (post_id, post_main_array)",
+        "INDEX **** ON post (post_thread_id, post_parent, post_starting_number, post_id)",
+        "INDEX **** ON post (post_starting_number)",
+        "INDEX **** ON post (post_starting_number, post_main_array)",
     ];
 
     for(let i = 0; i < buffer.length; i++) {
