@@ -5,10 +5,15 @@
 
 "use strict";
 
+/**
+ * print text information for debugging project
+ */
 function info() {
     // empty method
     // was used for printing
 }
+
+// init main constants
 
 const COUNT = " SERIAL PRIMARY KEY";
 const STRING = ' TEXT COLLATE "ucs_basic"';
@@ -40,6 +45,12 @@ const SORT_TYPE_3 = "parent_tree";
 
 console.log("*************************************\n\n");
 
+/**
+ * generate code of SQL table
+ * @param table
+ * @param arr
+ * @returns {string}
+ */
 function getTableSqlString(table, arr) {
     const buffer = [];
     const beginString = "    " + table + "_";
@@ -76,6 +87,8 @@ function getTableSqlString(table, arr) {
     return h1 + "\n" + h2 + "\n" + h3 + "\n" + h4 + "\n" + h5 + "\n";
 }
 
+// create tables of database
+
 const student = getTableSqlString("student", ["count.id", "string.about", "string.email", "string.fullname", "string.nickname"]);
 const forum = getTableSqlString("forum", ["count.id", "int.posts", "string.slug", "int.threads", "string.title", "string.nickname"]);
 const thread = getTableSqlString("thread", ["count.id", "string.author_nickname", "int.author_id", "time.created", "string.forum_slug", "int.forum_id", "string.message", "string.slug", "string.title", "int.votes"]);
@@ -84,6 +97,10 @@ const post = getTableSqlString("post", ["count.id", "string.student_nickname", "
         "string.forum_slug", "int.forum_id", "bool.is_edited", "string.message", "int.parent", "int.thread_id", "int.starting_number", "arr.main_array"]);
 const vote = getTableSqlString("vote", ["int.student_id", "int.voice", "int.thread_id"]);
 
+/**
+ * generate code for delete old indexes
+ * @returns {string}
+ */
 function dropIndexes() {
     const buffer = [];
     const number = 10;
@@ -107,6 +124,10 @@ let tablesBuffer = [
 
 const databaseTables = tablesBuffer.join("\n");
 
+/**
+ * generate code of all indexes to accelerate database working
+ * @returns {string}
+ */
 function createIndexes() {
     const buffer = [
         "UNIQUE INDEX **** ON student (LOWER(student_email))",
@@ -152,6 +173,14 @@ console.log(result);
 
 let databaseCreated = false;
 
+/**
+ * help to parse url content
+ * @param part_2
+ * @param value_2
+ * @param part_4
+ * @param value_4
+ * @returns {boolean}
+ */
 function twoPartsService(part_2, value_2, part_4, value_4) {
     if(part_2 !== value_2) {
         return false;
@@ -159,6 +188,10 @@ function twoPartsService(part_2, value_2, part_4, value_4) {
     return part_4 === value_4;
 }
 
+/**
+ * get empty object
+ * @returns {{}}
+ */
 function getObj() {
     return {};
 }
@@ -170,10 +203,20 @@ function getObj() {
 
 "use strict";
 
+/**
+ * get JSON string from simple object
+ * @param obj
+ * @returns {string}
+ */
 function str(obj) {
     return JSON.stringify(obj);
 }
 
+/**
+ * get object from JSON string (for parsing body of query from client)
+ * @param string
+ * @returns {any}
+ */
 function obj(string) {
     return JSON.parse(string);
 }
@@ -181,6 +224,8 @@ function obj(string) {
 const pg = require('pg');
 
 const connectParamsObj = {};
+
+// params for database
 
 connectParamsObj["user"] = USER;
 connectParamsObj["host"] = HOST;
@@ -190,6 +235,11 @@ connectParamsObj["port"] =  PORT;
 
 const connectObj = new pg.Pool(connectParamsObj);
 
+/**
+ * send SQL query to database
+ * @param queryContentString
+ * @returns {Promise<any>}
+ */
 function database(queryContentString) {
     info("Query: " + queryContentString);
     return new Promise((resolve) => {
@@ -210,6 +260,12 @@ function database(queryContentString) {
     });
 }
 
+/**
+ * send result to client
+ * @param response
+ * @param code
+ * @param content
+ */
 function answer(response, code, content) {
     info("code: " + code);
     info("result: " + content);
@@ -217,6 +273,10 @@ function answer(response, code, content) {
     response.end(content);
 }
 
+/**
+ * get date in timestamp with zone format
+ * @returns {string}
+ */
 function makeCreated() {
     return new Date().toISOString().toString();
 }
@@ -230,6 +290,10 @@ function makeCreated() {
 
 let application = require("express")();
 
+/**
+ * print query GET information
+ * @param request
+ */
 function printGetQueryInfo(request) {
     info("\n");
     info("************************************");
@@ -237,6 +301,10 @@ function printGetQueryInfo(request) {
     info("path ** " + request.url);
 }
 
+/**
+ * print query POST information
+ * @param request
+ */
 function printPostQueryInfoPost(request) {
     info("\n");
     info("************************************");
@@ -244,15 +312,25 @@ function printPostQueryInfoPost(request) {
     info("path ^^ " + request.url);
 }
 
+/**
+ * header for client init
+ * @param response
+ */
 function allowAll(response) {
     response.header("Access-Control-Allow-Origin", "*");
 }
 
+/**
+ * sending header to client
+ */
 application.use(function(request, response, next) {
     allowAll(response);
     next();
 });
 
+/**
+ * run the application
+ */
 function startMainServer() {
     const portValueInt = process.env.PORT || MAIN_PORT;
     application.listen(portValueInt);
@@ -263,6 +341,10 @@ function startMainServer() {
 
 startMainServer();
 
+/**
+ * catch GET queries
+ * @param application
+ */
 function incGetEvent(application) {
     application.get(ALLOW_ALL_PATH, (request, response) => {
         printGetQueryInfo(request);
@@ -270,6 +352,10 @@ function incGetEvent(application) {
     });
 }
 
+/**
+ * catch POST queries
+ * @param application
+ */
 function incPostEvent(application) {
     application.post(ALLOW_ALL_PATH, (request, response) => {
         printPostQueryInfoPost(request);
@@ -277,6 +363,9 @@ function incPostEvent(application) {
     });
 }
 
+/**
+ * catch all queries
+ */
 function addGetPostEvents() {
     incGetEvent(application);
     incPostEvent(application);
@@ -288,14 +377,27 @@ const NUMBERS = "1234567890";
 
 const NO = -1;
 
+/**
+ * get 1 (for debug)
+ * @returns {boolean}
+ */
 function getYes() {
     return true;
 }
 
+/**
+ * get 0 (f0r debug)
+ * @returns {boolean}
+ */
 function getNo() {
     return false;
 }
 
+/**
+ * control slug or id of thread
+ * @param stringContentParam
+ * @returns {boolean}
+ */
 function onlyNumbers(stringContentParam) {
     for(let i = 0; i < stringContentParam.length; ++i) {
         const stringElement = stringContentParam.charAt(i);
@@ -309,6 +411,11 @@ function onlyNumbers(stringContentParam) {
 const URL_SPLITTER = "&";
 const EQUAL_CHAR = "=";
 
+/**
+ * parse variables in url
+ * @param stringContentParam
+ * @returns {{}}
+ */
 function wordsArray(stringContentParam) {
     if(stringContentParam) {
         const wordsObject = getObj();
@@ -325,6 +432,11 @@ function wordsArray(stringContentParam) {
     }
 }
 
+/**
+ * get since variable
+ * @param argumentsArr
+ * @returns {*}
+ */
 function getSince(argumentsArr) {
     let since = null;
     if(argumentsArr["since"]) {
@@ -333,6 +445,11 @@ function getSince(argumentsArr) {
     return since;
 }
 
+/**
+ * get limit variable
+ * @param argumentsArr
+ * @returns {*}
+ */
 function getLimit(argumentsArr) {
     let limit = null;
     if(argumentsArr["limit"]) {
@@ -341,6 +458,11 @@ function getLimit(argumentsArr) {
     return limit;
 }
 
+/**
+ * get sort variable
+ * @param argumentsArr
+ * @returns {string}
+ */
 function getSort(argumentsArr) {
     let sortingString = "ASC";
     if(argumentsArr["desc"] === "true") {
@@ -349,12 +471,23 @@ function getSort(argumentsArr) {
     return sortingString;
 }
 
+/**
+ * duplicate integer arrays
+ * @param resultArray
+ * @param buffer
+ */
 function makeDouble(resultArray, buffer) {
     buffer.forEach((element) => {
         resultArray.push(element);
     });
 }
 
+/**
+ * find the word in string
+ * @param bigString
+ * @param littleString
+ * @returns {boolean}
+ */
 function includeString(bigString, littleString) {
     return bigString.indexOf(littleString) !== NO;
 }
@@ -366,10 +499,20 @@ function includeString(bigString, littleString) {
 
 "use strict";
 
+/**
+ * get array (for debug)
+ * @returns {Array}
+ */
 function getEmptyArray() {
     return [];
 }
 
+/**
+ * catch Get queries and call functions
+ * @param request
+ * @param response
+ * @returns {null}
+ */
 function getQuery(request, response) {
     if(request.url === "/api") {
         if(databaseCreated === false) {
@@ -440,9 +583,16 @@ function getQuery(request, response) {
     }
 }
 
+// queue
 let arrGlobal = getEmptyArray();
 let emptyProc = true;
 
+/**
+ * push the query to queue
+ * @param request
+ * @param response
+ * @param bodyObj
+ */
 function pushQueryInformationToGlobalArr(request, response, bodyObj) {
     const resObj = {
         request: request,
@@ -470,7 +620,11 @@ setInterval(() => {
     }
 }, TIMER_WAIT_TIME_PARAM);
 
-
+/**
+ * catch Post query and save it to queue
+ * @param request
+ * @param response
+ */
 function postQuery(request, response) {
     if(request.url === "/api/service/clear") {
         pushQueryInformationToGlobalArr(request, response, getObj());
@@ -485,6 +639,13 @@ function postQuery(request, response) {
     }
 }
 
+/**
+ * catch Post queries and call functions
+ * @param request
+ * @param response
+ * @param mainObj
+ * @returns {null}
+ */
 function postQueryExe(request, response, mainObj) {
     if(mainObj) {
         if (request.url === "/api/service/clear") {
@@ -551,6 +712,11 @@ function postQueryExe(request, response, mainObj) {
 
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ */
 function functionGetNumberCountOfStudentForumPostThreadSevice(request, response) {
     const buffer = getObj();
     database(getCountOfTheElementByTableName(FORUM))
@@ -572,6 +738,11 @@ function functionGetNumberCountOfStudentForumPostThreadSevice(request, response)
         });
 }
 
+/**
+ *
+ * @param tableName
+ * @returns {string}
+ */
 function getCountOfTheElementByTableName(tableName) {
     const buffer = [];
     buffer.push("SELECT COUNT(*)");
@@ -581,10 +752,21 @@ function getCountOfTheElementByTableName(tableName) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param element
+ * @returns {number}
+ */
 function getIntegerByZeroValue(element) {
     return parseInt(element.rows[0].value);
 }
 
+/**
+ *
+ * @param mainObj
+ * @param part_3
+ * @returns {string}
+ */
 function updateUserQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("UPDATE student SET student_id = student_id + 0");
@@ -602,6 +784,11 @@ function updateUserQuery(mainObj, part_3) {
     return part;
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function selectOneUserQuery(part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM student");
@@ -610,6 +797,11 @@ function selectOneUserQuery(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param p
+ * @returns {*}
+ */
 function getOneStudentFromArr(p) {
     const arr = [];
     p.rows.forEach((element) => {
@@ -623,6 +815,13 @@ function getOneStudentFromArr(p) {
     return arr[0];
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToUpdateInformationAboutUserAfterControlUserExists(request, response, mainObj, part_3) {
     const part = updateUserQuery(mainObj, part_3);
     database(part)
@@ -641,6 +840,11 @@ function tryToUpdateInformationAboutUserAfterControlUserExists(request, response
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getStudentCountFromArr(part_3) {
     const buffer = [];
     buffer.push("SELECT COUNT(*) FROM student WHERE");
@@ -648,6 +852,13 @@ function getStudentCountFromArr(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToUpdateInformationAboutUser(request, response, mainObj, part_3) {
     database(getStudentCountFromArr(part_3))
         .then((p) => {
@@ -662,6 +873,11 @@ function tryToUpdateInformationAboutUser(request, response, mainObj, part_3) {
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getOneStudentFromArray(part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM student WHERE");
@@ -670,6 +886,11 @@ function getOneStudentFromArray(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param p
+ * @param response
+ */
 function getInfoOneStudentFromArr(p, response) {
     const arr = [];
     p.rows.forEach((element) => {
@@ -683,6 +904,12 @@ function getInfoOneStudentFromArr(p, response) {
     answer(response, 200, str(arr[0]));
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ */
 function tryToGetInformationAboutUserInDatabase(request, response, part_3) {
     database(getOneStudentFromArray(part_3))
         .then((p) => {
@@ -696,6 +923,12 @@ function tryToGetInformationAboutUserInDatabase(request, response, part_3) {
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param part_3
+ * @returns {string}
+ */
 function insertStudentQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("INSERT INTO student (student_about, student_email, ");
@@ -709,6 +942,12 @@ function insertStudentQuery(mainObj, part_3) {
     return buffer.join("");
 }
 
+/**
+ *
+ * @param mainObj
+ * @param part_3
+ * @returns {string}
+ */
 function getConflictStudentsQuery(mainObj, part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM student WHERE ");
@@ -719,6 +958,11 @@ function getConflictStudentsQuery(mainObj, part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param p
+ * @param response
+ */
 function sendConflictStudents(p, response) {
     const arr = [];
     p.rows.forEach((element) => {
@@ -732,6 +976,13 @@ function sendConflictStudents(p, response) {
     answer(response, 409, str(arr));
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToAddUserToDatabase(request, response, mainObj, part_3) {
     database(insertStudentQuery(mainObj, part_3) )
         .then((p) => {
@@ -758,6 +1009,11 @@ function tryToAddUserToDatabase(request, response, mainObj, part_3) {
 
 "use strict";
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getTheOneStudentQuery(mainObj) {
     const buffer = [];
     buffer.push("SELECT student_nickname FROM student WHERE");
@@ -766,6 +1022,12 @@ function getTheOneStudentQuery(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ */
 function tryToAddNewForumOfStudentToDatabase(request, response, mainObj) {
     database(getTheOneStudentQuery(mainObj))
         .then((p) => {
@@ -779,6 +1041,12 @@ function tryToAddNewForumOfStudentToDatabase(request, response, mainObj) {
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param student
+ * @returns {string}
+ */
 function addStudentForumInDatabaseQuery(mainObj, student) {
     const buffer = [];
     buffer.push("INSERT INTO forum");
@@ -787,6 +1055,11 @@ function addStudentForumInDatabaseQuery(mainObj, student) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getObjOneForumOfStudentQuery(mainObj) {
     const buffer = [];
     buffer.push("SELECT * FROM forum");
@@ -795,6 +1068,13 @@ function getObjOneForumOfStudentQuery(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param student
+ */
 function insertForumOfStudentToDatabase(request, response, mainObj, student) {
     database(addStudentForumInDatabaseQuery(mainObj, student))
         .then((p) => {
@@ -823,6 +1103,11 @@ function insertForumOfStudentToDatabase(request, response, mainObj, student) {
         })
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function tryOneForumBySlugValue(part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM forum");
@@ -831,6 +1116,12 @@ function tryOneForumBySlugValue(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ */
 function tryToGetForumInformation(request, response, part_3) {
     database(tryOneForumBySlugValue(part_3))
         .then((p) => {
@@ -860,6 +1151,11 @@ function tryToGetForumInformation(request, response, part_3) {
 
 let threadCounter = 42;
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function tryToGetOneStudentForThread(mainObj) {
     const buffer = [];
     buffer.push("SELECT student_id, student_nickname FROM student");
@@ -868,6 +1164,13 @@ function tryToGetOneStudentForThread(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToCreateThreadInForum(request, response, mainObj, part_3) {
     database(tryToGetOneStudentForThread(mainObj))
         .then((p) => {
@@ -884,6 +1187,11 @@ function tryToCreateThreadInForum(request, response, mainObj, part_3) {
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function beSureExistsForumQuery(part_3) {
     const buffer = [];
     buffer.push("SELECT forum_id, forum_slug FROM forum");
@@ -892,6 +1200,14 @@ function beSureExistsForumQuery(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param user
+ */
 function tryToCreateThreadInForumPartTwo(request, response, mainObj, part_3, user) {
     database(beSureExistsForumQuery(part_3))
         .then((p) => {
@@ -908,6 +1224,15 @@ function tryToCreateThreadInForumPartTwo(request, response, mainObj, part_3, use
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param user
+ * @param forum
+ */
 function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, user, forum) {
     threadCounter++;
 
@@ -968,6 +1293,11 @@ function tryToCreateThreadInForumPartThree(request, response, mainObj, part_3, u
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getConflictThreadData(mainObj) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -976,6 +1306,11 @@ function getConflictThreadData(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param forum
+ * @returns {string}
+ */
 function incrementOfPostNumberInForumQuery(forum) {
     const buffer = [];
     buffer.push("UPDATE forum SET");
@@ -984,6 +1319,12 @@ function incrementOfPostNumberInForumQuery(forum) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param forum
+ * @param user
+ * @returns {string}
+ */
 function addToJoinTablePair(forum, user) {
     const buffer = [];
     buffer.push("INSERT INTO jointable");
@@ -992,6 +1333,15 @@ function addToJoinTablePair(forum, user) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param user
+ * @param forum
+ */
 function tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3, user, forum) {
     info("end function");
     database(incrementOfPostNumberInForumQuery(forum))
@@ -1021,6 +1371,11 @@ function tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3
         });
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getInformationOneForumSlugId(part_3) {
     const buffer = [];
     buffer.push("SELECT forum_id, forum_slug FROM forum");
@@ -1029,6 +1384,13 @@ function getInformationOneForumSlugId(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ */
 function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
     database(getInformationOneForumSlugId(part_3))
         .then((p) => {
@@ -1045,6 +1407,14 @@ function tryToGetForumThreadsList(request, response, part_3, argumentsArr) {
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ * @param forum
+ */
 function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr, forum) {
     const since = getSince(argumentsArr);
     const vector = getSort(argumentsArr);
@@ -1099,6 +1469,11 @@ function tryToGetForumThreadsListPartTwo(request, response, part_3, argumentsArr
 
 let postCounter = 42;
 
+/**
+ *
+ * @param threadSlugId
+ * @param continueMethod
+ */
 function controlThreadParamsSlugAndIdParam(threadSlugId, continueMethod) {
     const buffer = [];
     buffer.push("SELECT thread_id, thread_slug, thread_forum_slug, thread_forum_id FROM thread");
@@ -1129,6 +1504,13 @@ function controlThreadParamsSlugAndIdParam(threadSlugId, continueMethod) {
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ */
 function tryToAddBigListOfPosts(request, response, commentsList, part_3) {
     controlThreadParamsSlugAndIdParam(part_3, (thread) => {
         if(!thread) {
@@ -1148,6 +1530,10 @@ function tryToAddBigListOfPosts(request, response, commentsList, part_3) {
     });
 }
 
+/**
+ *
+ * @param commentsList
+ */
 function addParentIfNessesary(commentsList) {
     commentsList.forEach((comment) => {
         if(!comment.parent) {
@@ -1156,6 +1542,12 @@ function addParentIfNessesary(commentsList) {
     });
 }
 
+/**
+ *
+ * @param parrents
+ * @param thread
+ * @returns {string}
+ */
 function generateSetMapQuery(parrents, thread) {
     const setMapStr = parrents.join(",");
     const buffer = [];
@@ -1166,6 +1558,11 @@ function generateSetMapQuery(parrents, thread) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param commentsList
+ * @returns {Array}
+ */
 function getParrentsListFromObj(commentsList) {
     const parrents = [];
     commentsList.forEach((comment) => {
@@ -1174,6 +1571,14 @@ function getParrentsListFromObj(commentsList) {
     return parrents;
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ * @param thread
+ */
 function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, thread) {
     addParentIfNessesary(commentsList);
     const parrents = getParrentsListFromObj(commentsList);
@@ -1208,6 +1613,11 @@ function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, 
         });
 }
 
+/**
+ *
+ * @param commentsList
+ * @returns {string}
+ */
 function getStudentsPathDataObj(commentsList) {
     const buffer = [];
     buffer.push("SELECT student_id, student_nickname FROM student");
@@ -1215,6 +1625,11 @@ function getStudentsPathDataObj(commentsList) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param commentsList
+ * @returns {string}
+ */
 function getListStudentsPost(commentsList) {
     const studentsLower = [];
     commentsList.forEach((comment) => {
@@ -1225,6 +1640,15 @@ function getListStudentsPost(commentsList) {
     return studentsLower.join(",");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ * @param thread
+ * @param parrentsExistingInDatabase
+ */
 function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     info("All parents exists");
     database(getStudentsPathDataObj(commentsList))
@@ -1254,6 +1678,15 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ * @param thread
+ * @param parrentsExistingInDatabase
+ */
 function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     const bufferGlobal = [];
     const created = makeCreated();
@@ -1380,6 +1813,12 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
         });
 }
 
+/**
+ *
+ * @param commentsList
+ * @param thread
+ * @returns {string}
+ */
 function addingJoiningPairsForumStudent(commentsList, thread) {
     const forum_id = thread.forumID;
     const buffer = [];
@@ -1391,6 +1830,12 @@ function addingJoiningPairsForumStudent(commentsList, thread) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param forum_id
+ * @param student_id
+ * @returns {string}
+ */
 function addToJoinTablePairAfterAddingPost(forum_id, student_id) {
     const buffer = [];
     buffer.push("INSERT INTO jointable");
@@ -1399,6 +1844,12 @@ function addToJoinTablePairAfterAddingPost(forum_id, student_id) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param postNumberAll
+ * @param thread
+ * @returns {string}
+ */
 function addPostsNumberInOneForumQuery(postNumberAll, thread) {
     const buffer = [];
     buffer.push("UPDATE forum SET");
@@ -1414,6 +1865,12 @@ function addPostsNumberInOneForumQuery(postNumberAll, thread) {
 
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ */
 function tryToGetFullInformationAboutOneThread(request, response, part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -1455,6 +1912,11 @@ function tryToGetFullInformationAboutOneThread(request, response, part_3) {
         });
 }
 
+/**
+ *
+ * @param threadSlugId
+ * @param continueMethod
+ */
 function controlThreadParamsSlugAndIdParamForMakingVotes(threadSlugId, continueMethod) {
     const buffer = [];
     buffer.push("SELECT thread_id FROM thread");
@@ -1482,6 +1944,13 @@ function controlThreadParamsSlugAndIdParamForMakingVotes(threadSlugId, continueM
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3) {
     controlThreadParamsSlugAndIdParamForMakingVotes(part_3, (thread) => {
         if(!thread) {
@@ -1495,6 +1964,11 @@ function tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3) 
     });
 }
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getStudetnIDforMakingVoteQuery(mainObj) {
     const buffer = [];
     buffer.push("SELECT student_id FROM student");
@@ -1503,6 +1977,14 @@ function getStudetnIDforMakingVoteQuery(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ */
 function tryToAddOrUpdateVoteOfUserToThreadPartTwo(request, response, mainObj, part_3, threadID) {
     database(getStudetnIDforMakingVoteQuery(mainObj))
         .then((p) => {
@@ -1517,6 +1999,13 @@ function tryToAddOrUpdateVoteOfUserToThreadPartTwo(request, response, mainObj, p
         });
 }
 
+/**
+ *
+ * @param studentID
+ * @param mainObj
+ * @param threadID
+ * @returns {string}
+ */
 function generateInsertVoteQueryForVote(studentID, mainObj, threadID) {
     const buffer = [];
     buffer.push("INSERT INTO vote");
@@ -1525,6 +2014,15 @@ function generateInsertVoteQueryForVote(studentID, mainObj, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ * @param studentID
+ */
 function tryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj, part_3, threadID, studentID) {
     database(generateInsertVoteQueryForVote(studentID, mainObj, threadID))
         .then((p) => {
@@ -1539,6 +2037,12 @@ function tryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj,
         });
 }
 
+/**
+ *
+ * @param studentID
+ * @param threadID
+ * @returns {string}
+ */
 function getVoiceVoteStudentValue(studentID, threadID) {
     const buffer = [];
     buffer.push("SELECT vote_voice FROM vote");
@@ -1547,6 +2051,12 @@ function getVoiceVoteStudentValue(studentID, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param oldV
+ * @param newV
+ * @returns {number}
+ */
 function getDelta(oldV, newV) {
     if(oldV === newV) return 0;
     if(oldV === -1 && newV === 1) return 2;
@@ -1555,6 +2065,15 @@ function getDelta(oldV, newV) {
     throw new Error();
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ * @param studentID
+ */
 function needToUpdateFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj, part_3, threadID, studentID) {
     database(getVoiceVoteStudentValue(studentID, threadID))
         .then((p) => {
@@ -1612,6 +2131,12 @@ function needToUpdateFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, re
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param threadID
+ * @returns {string}
+ */
 function updateThreadPostMumberVote(mainObj, threadID) {
     const buffer = [];
     buffer.push("UPDATE thread SET");
@@ -1624,6 +2149,11 @@ function updateThreadPostMumberVote(mainObj, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param threadID
+ * @returns {string}
+ */
 function getThreadByIdVoteGetQuery(threadID) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -1632,6 +2162,15 @@ function getThreadByIdVoteGetQuery(threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ * @param studentID
+ */
 function insertOKFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj, part_3, threadID, studentID) {
     database(updateThreadPostMumberVote(mainObj, threadID))
         .then((p1) => {
@@ -1662,6 +2201,13 @@ function insertOKFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, respon
 
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param continueMetod
+ */
 function tryToGetFullInformationThreadForReadingPosts(request, response, threadSlugId, continueMetod) {
     const buffer = [];
     buffer.push("SELECT thread_id FROM thread");
@@ -1689,6 +2235,14 @@ function tryToGetFullInformationThreadForReadingPosts(request, response, threadS
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ * @param threadID
+ */
 function sortTypeFirstMethodPosts(request, response, threadSlugId, argumentsArr, threadID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -1728,6 +2282,14 @@ function sortTypeFirstMethodPosts(request, response, threadSlugId, argumentsArr,
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ * @param threadID
+ */
 function sortTypeSecondMethodPosts(request, response, threadSlugId, argumentsArr, threadID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -1768,6 +2330,14 @@ function sortTypeSecondMethodPosts(request, response, threadSlugId, argumentsArr
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ * @param threadID
+ */
 function sortTypeThirdMethodPosts(request, response, threadSlugId, argumentsArr, threadID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -1811,6 +2381,13 @@ function sortTypeThirdMethodPosts(request, response, threadSlugId, argumentsArr,
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ */
 function tryToGetListOfPostsFlatThreeParentThree(request, response, threadSlugId, argumentsArr) {
     tryToGetFullInformationThreadForReadingPosts(request, response, threadSlugId, (threadID) => {
         info("Thread Id: " + threadID);
@@ -1840,6 +2417,13 @@ function tryToGetListOfPostsFlatThreeParentThree(request, response, threadSlugId
 
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param continueMetod
+ */
 function tryToGetFullInformationThreadForUpdatingThreadContent(request, response, threadSlugId, continueMetod) {
     const buffer = [];
     buffer.push("SELECT thread_id FROM thread");
@@ -1867,6 +2451,11 @@ function tryToGetFullInformationThreadForUpdatingThreadContent(request, response
         });
 }
 
+/**
+ *
+ * @param threadID
+ * @returns {string}
+ */
 function tryToGetThreadFullInfoAfterUpdate(threadID) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -1875,6 +2464,13 @@ function tryToGetThreadFullInfoAfterUpdate(threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param threadSlugId
+ */
 function tryToUpdateMessageOrTitleOfTheThread(request, response, mainObj, threadSlugId) {
     tryToGetFullInformationThreadForUpdatingThreadContent(request, response, threadSlugId, (threadID) => {
         database(tryUpdateBranchContent(mainObj, threadID) + tryToGetThreadFullInfoAfterUpdate(threadID))
@@ -1897,6 +2493,12 @@ function tryToUpdateMessageOrTitleOfTheThread(request, response, mainObj, thread
     });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param threadID
+ * @returns {string}
+ */
 function tryUpdateBranchContent(mainObj, threadID) {
     const buffer = [];
     buffer.push("UPDATE thread SET thread_author_id = thread_author_id + 0");
@@ -1910,6 +2512,11 @@ function tryUpdateBranchContent(mainObj, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getForumTheIDForGettingForumUsers(part_3) {
     const buffer = [];
     buffer.push("SELECT forum_id FROM forum");
@@ -1918,6 +2525,13 @@ function getForumTheIDForGettingForumUsers(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ */
 function tryToGetAllStudentsThatHaveBranchPrPostInTheForum(request, response, part_3, argumentsArr) {
     database(getForumTheIDForGettingForumUsers(part_3))
         .then((p) => {
@@ -1932,6 +2546,14 @@ function tryToGetAllStudentsThatHaveBranchPrPostInTheForum(request, response, pa
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ * @param forumID
+ */
 function tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, response, part_3, argumentsArr, forumID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -1973,6 +2595,11 @@ function tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, respo
         });
 }
 
+/**
+ *
+ * @param postID
+ * @returns {string}
+ */
 function getOnePostToInfoPostDetails(postID) {
     const buffer = [];
     buffer.push("SELECT * FROM post");
@@ -1981,6 +2608,13 @@ function getOnePostToInfoPostDetails(postID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param postID
+ */
 function tryToUpdatePostMessageInComment(request, response, mainObj, postID) {
     info("Update post method");
     database(getOnePostToInfoPostDetails(postID))
@@ -1996,6 +2630,12 @@ function tryToUpdatePostMessageInComment(request, response, mainObj, postID) {
         });
 }
 
+/**
+ *
+ * @param messageAfter
+ * @param postID
+ * @returns {string}
+ */
 function getUpdateOneCommentQuery(messageAfter, postID) {
     const buffer = [];
     buffer.push("UPDATE post SET");
@@ -2005,6 +2645,14 @@ function getUpdateOneCommentQuery(messageAfter, postID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param postID
+ * @param post
+ */
 function tryToUpdatePostMessageInCommentPartFive(request, response, mainObj, postID, post) {
     info("post exists ok");
     const messageBefore = post.post_message;
@@ -2043,6 +2691,13 @@ function tryToUpdatePostMessageInCommentPartFive(request, response, mainObj, pos
     }
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param postID
+ * @param argumentsArr
+ */
 function tryToGetInformationAboutOnePostSimple(request, response, postID, argumentsArr) {
     database(getOnePostToInfoPostDetails(postID))
         .then((p) => {
@@ -2057,6 +2712,14 @@ function tryToGetInformationAboutOnePostSimple(request, response, postID, argume
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param postID
+ * @param argumentsArr
+ * @param post
+ */
 function tryToGetInformationAboutOnePostSimplePartTwo(request, response, postID, argumentsArr, post) {
     info("Post Exists");
     if(!argumentsArr["related"]) {
