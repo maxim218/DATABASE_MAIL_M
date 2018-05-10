@@ -401,13 +401,7 @@ function getNo() {
  * @returns {boolean}
  */
 function onlyNumbers(stringContentParam) {
-    for(let i = 0; i < stringContentParam.length; ++i) {
-        const stringElement = stringContentParam.charAt(i);
-        if(NUMBERS.indexOf(stringElement) === NO) {
-            return getNo();
-        }
-    }
-    return getYes();
+    return stringContentParam === parseInt(stringContentParam) + "";
 }
 
 const URL_SPLITTER = "&";
