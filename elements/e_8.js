@@ -2,6 +2,11 @@
 
 let postCounter = 42;
 
+/**
+ *
+ * @param threadSlugId
+ * @param continueMethod
+ */
 function controlThreadParamsSlugAndIdParam(threadSlugId, continueMethod) {
     const buffer = [];
     buffer.push("SELECT thread_id, thread_slug, thread_forum_slug, thread_forum_id FROM thread");
@@ -32,6 +37,13 @@ function controlThreadParamsSlugAndIdParam(threadSlugId, continueMethod) {
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ */
 function tryToAddBigListOfPosts(request, response, commentsList, part_3) {
     controlThreadParamsSlugAndIdParam(part_3, (thread) => {
         if(!thread) {
@@ -51,6 +63,10 @@ function tryToAddBigListOfPosts(request, response, commentsList, part_3) {
     });
 }
 
+/**
+ *
+ * @param commentsList
+ */
 function addParentIfNessesary(commentsList) {
     commentsList.forEach((comment) => {
         if(!comment.parent) {
@@ -59,6 +75,12 @@ function addParentIfNessesary(commentsList) {
     });
 }
 
+/**
+ *
+ * @param parrents
+ * @param thread
+ * @returns {string}
+ */
 function generateSetMapQuery(parrents, thread) {
     const setMapStr = parrents.join(",");
     const buffer = [];
@@ -69,6 +91,11 @@ function generateSetMapQuery(parrents, thread) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param commentsList
+ * @returns {Array}
+ */
 function getParrentsListFromObj(commentsList) {
     const parrents = [];
     commentsList.forEach((comment) => {
@@ -77,6 +104,14 @@ function getParrentsListFromObj(commentsList) {
     return parrents;
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ * @param thread
+ */
 function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, thread) {
     addParentIfNessesary(commentsList);
     const parrents = getParrentsListFromObj(commentsList);
@@ -111,6 +146,11 @@ function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, 
         });
 }
 
+/**
+ *
+ * @param commentsList
+ * @returns {string}
+ */
 function getStudentsPathDataObj(commentsList) {
     const buffer = [];
     buffer.push("SELECT student_id, student_nickname FROM student");
@@ -118,6 +158,11 @@ function getStudentsPathDataObj(commentsList) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param commentsList
+ * @returns {string}
+ */
 function getListStudentsPost(commentsList) {
     const studentsLower = [];
     commentsList.forEach((comment) => {
@@ -128,6 +173,15 @@ function getListStudentsPost(commentsList) {
     return studentsLower.join(",");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ * @param thread
+ * @param parrentsExistingInDatabase
+ */
 function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     info("All parents exists");
     database(getStudentsPathDataObj(commentsList))
@@ -157,6 +211,15 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param commentsList
+ * @param part_3
+ * @param thread
+ * @param parrentsExistingInDatabase
+ */
 function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase) {
     const bufferGlobal = [];
     const created = makeCreated();
@@ -283,6 +346,12 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
         });
 }
 
+/**
+ *
+ * @param commentsList
+ * @param thread
+ * @returns {string}
+ */
 function addingJoiningPairsForumStudent(commentsList, thread) {
     const forum_id = thread.forumID;
     const buffer = [];
@@ -294,6 +363,12 @@ function addingJoiningPairsForumStudent(commentsList, thread) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param forum_id
+ * @param student_id
+ * @returns {string}
+ */
 function addToJoinTablePairAfterAddingPost(forum_id, student_id) {
     const buffer = [];
     buffer.push("INSERT INTO jointable");
@@ -302,6 +377,12 @@ function addToJoinTablePairAfterAddingPost(forum_id, student_id) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param postNumberAll
+ * @param thread
+ * @returns {string}
+ */
 function addPostsNumberInOneForumQuery(postNumberAll, thread) {
     const buffer = [];
     buffer.push("UPDATE forum SET");

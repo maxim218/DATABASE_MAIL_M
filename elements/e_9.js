@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ */
 function tryToGetFullInformationAboutOneThread(request, response, part_3) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -41,6 +47,11 @@ function tryToGetFullInformationAboutOneThread(request, response, part_3) {
         });
 }
 
+/**
+ *
+ * @param threadSlugId
+ * @param continueMethod
+ */
 function controlThreadParamsSlugAndIdParamForMakingVotes(threadSlugId, continueMethod) {
     const buffer = [];
     buffer.push("SELECT thread_id FROM thread");
@@ -68,6 +79,13 @@ function controlThreadParamsSlugAndIdParamForMakingVotes(threadSlugId, continueM
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ */
 function tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3) {
     controlThreadParamsSlugAndIdParamForMakingVotes(part_3, (thread) => {
         if(!thread) {
@@ -81,6 +99,11 @@ function tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3) 
     });
 }
 
+/**
+ *
+ * @param mainObj
+ * @returns {string}
+ */
 function getStudetnIDforMakingVoteQuery(mainObj) {
     const buffer = [];
     buffer.push("SELECT student_id FROM student");
@@ -89,6 +112,14 @@ function getStudetnIDforMakingVoteQuery(mainObj) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ */
 function tryToAddOrUpdateVoteOfUserToThreadPartTwo(request, response, mainObj, part_3, threadID) {
     database(getStudetnIDforMakingVoteQuery(mainObj))
         .then((p) => {
@@ -103,6 +134,13 @@ function tryToAddOrUpdateVoteOfUserToThreadPartTwo(request, response, mainObj, p
         });
 }
 
+/**
+ *
+ * @param studentID
+ * @param mainObj
+ * @param threadID
+ * @returns {string}
+ */
 function generateInsertVoteQueryForVote(studentID, mainObj, threadID) {
     const buffer = [];
     buffer.push("INSERT INTO vote");
@@ -111,6 +149,15 @@ function generateInsertVoteQueryForVote(studentID, mainObj, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ * @param studentID
+ */
 function tryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj, part_3, threadID, studentID) {
     database(generateInsertVoteQueryForVote(studentID, mainObj, threadID))
         .then((p) => {
@@ -125,6 +172,12 @@ function tryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj,
         });
 }
 
+/**
+ *
+ * @param studentID
+ * @param threadID
+ * @returns {string}
+ */
 function getVoiceVoteStudentValue(studentID, threadID) {
     const buffer = [];
     buffer.push("SELECT vote_voice FROM vote");
@@ -133,6 +186,12 @@ function getVoiceVoteStudentValue(studentID, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param oldV
+ * @param newV
+ * @returns {number}
+ */
 function getDelta(oldV, newV) {
     if(oldV === newV) return 0;
     if(oldV === -1 && newV === 1) return 2;
@@ -141,6 +200,15 @@ function getDelta(oldV, newV) {
     throw new Error();
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ * @param studentID
+ */
 function needToUpdateFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj, part_3, threadID, studentID) {
     database(getVoiceVoteStudentValue(studentID, threadID))
         .then((p) => {
@@ -198,6 +266,12 @@ function needToUpdateFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, re
         });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param threadID
+ * @returns {string}
+ */
 function updateThreadPostMumberVote(mainObj, threadID) {
     const buffer = [];
     buffer.push("UPDATE thread SET");
@@ -210,6 +284,11 @@ function updateThreadPostMumberVote(mainObj, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param threadID
+ * @returns {string}
+ */
 function getThreadByIdVoteGetQuery(threadID) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -218,6 +297,15 @@ function getThreadByIdVoteGetQuery(threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param part_3
+ * @param threadID
+ * @param studentID
+ */
 function insertOKFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, response, mainObj, part_3, threadID, studentID) {
     database(updateThreadPostMumberVote(mainObj, threadID))
         .then((p1) => {

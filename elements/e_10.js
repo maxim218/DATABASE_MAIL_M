@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param continueMetod
+ */
 function tryToGetFullInformationThreadForReadingPosts(request, response, threadSlugId, continueMetod) {
     const buffer = [];
     buffer.push("SELECT thread_id FROM thread");
@@ -27,6 +34,14 @@ function tryToGetFullInformationThreadForReadingPosts(request, response, threadS
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ * @param threadID
+ */
 function sortTypeFirstMethodPosts(request, response, threadSlugId, argumentsArr, threadID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -66,6 +81,14 @@ function sortTypeFirstMethodPosts(request, response, threadSlugId, argumentsArr,
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ * @param threadID
+ */
 function sortTypeSecondMethodPosts(request, response, threadSlugId, argumentsArr, threadID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -106,6 +129,14 @@ function sortTypeSecondMethodPosts(request, response, threadSlugId, argumentsArr
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ * @param threadID
+ */
 function sortTypeThirdMethodPosts(request, response, threadSlugId, argumentsArr, threadID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -149,6 +180,13 @@ function sortTypeThirdMethodPosts(request, response, threadSlugId, argumentsArr,
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param argumentsArr
+ */
 function tryToGetListOfPostsFlatThreeParentThree(request, response, threadSlugId, argumentsArr) {
     tryToGetFullInformationThreadForReadingPosts(request, response, threadSlugId, (threadID) => {
         info("Thread Id: " + threadID);

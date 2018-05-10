@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param threadSlugId
+ * @param continueMetod
+ */
 function tryToGetFullInformationThreadForUpdatingThreadContent(request, response, threadSlugId, continueMetod) {
     const buffer = [];
     buffer.push("SELECT thread_id FROM thread");
@@ -27,6 +34,11 @@ function tryToGetFullInformationThreadForUpdatingThreadContent(request, response
         });
 }
 
+/**
+ *
+ * @param threadID
+ * @returns {string}
+ */
 function tryToGetThreadFullInfoAfterUpdate(threadID) {
     const buffer = [];
     buffer.push("SELECT * FROM thread");
@@ -35,6 +47,13 @@ function tryToGetThreadFullInfoAfterUpdate(threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param threadSlugId
+ */
 function tryToUpdateMessageOrTitleOfTheThread(request, response, mainObj, threadSlugId) {
     tryToGetFullInformationThreadForUpdatingThreadContent(request, response, threadSlugId, (threadID) => {
         database(tryUpdateBranchContent(mainObj, threadID) + tryToGetThreadFullInfoAfterUpdate(threadID))
@@ -57,6 +76,12 @@ function tryToUpdateMessageOrTitleOfTheThread(request, response, mainObj, thread
     });
 }
 
+/**
+ *
+ * @param mainObj
+ * @param threadID
+ * @returns {string}
+ */
 function tryUpdateBranchContent(mainObj, threadID) {
     const buffer = [];
     buffer.push("UPDATE thread SET thread_author_id = thread_author_id + 0");
@@ -70,6 +95,11 @@ function tryUpdateBranchContent(mainObj, threadID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param part_3
+ * @returns {string}
+ */
 function getForumTheIDForGettingForumUsers(part_3) {
     const buffer = [];
     buffer.push("SELECT forum_id FROM forum");
@@ -78,6 +108,13 @@ function getForumTheIDForGettingForumUsers(part_3) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ */
 function tryToGetAllStudentsThatHaveBranchPrPostInTheForum(request, response, part_3, argumentsArr) {
     database(getForumTheIDForGettingForumUsers(part_3))
         .then((p) => {
@@ -92,6 +129,14 @@ function tryToGetAllStudentsThatHaveBranchPrPostInTheForum(request, response, pa
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param part_3
+ * @param argumentsArr
+ * @param forumID
+ */
 function tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, response, part_3, argumentsArr, forumID) {
     const limit = getLimit(argumentsArr);
     const type = getSort(argumentsArr);
@@ -133,6 +178,11 @@ function tryToGetAllStudentsThatHaveBranchPrPostInTheForumPartTwo(request, respo
         });
 }
 
+/**
+ *
+ * @param postID
+ * @returns {string}
+ */
 function getOnePostToInfoPostDetails(postID) {
     const buffer = [];
     buffer.push("SELECT * FROM post");
@@ -141,6 +191,13 @@ function getOnePostToInfoPostDetails(postID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param postID
+ */
 function tryToUpdatePostMessageInComment(request, response, mainObj, postID) {
     info("Update post method");
     database(getOnePostToInfoPostDetails(postID))
@@ -156,6 +213,12 @@ function tryToUpdatePostMessageInComment(request, response, mainObj, postID) {
         });
 }
 
+/**
+ *
+ * @param messageAfter
+ * @param postID
+ * @returns {string}
+ */
 function getUpdateOneCommentQuery(messageAfter, postID) {
     const buffer = [];
     buffer.push("UPDATE post SET");
@@ -165,6 +228,14 @@ function getUpdateOneCommentQuery(messageAfter, postID) {
     return buffer.join(" ");
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param mainObj
+ * @param postID
+ * @param post
+ */
 function tryToUpdatePostMessageInCommentPartFive(request, response, mainObj, postID, post) {
     info("post exists ok");
     const messageBefore = post.post_message;
@@ -203,6 +274,13 @@ function tryToUpdatePostMessageInCommentPartFive(request, response, mainObj, pos
     }
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param postID
+ * @param argumentsArr
+ */
 function tryToGetInformationAboutOnePostSimple(request, response, postID, argumentsArr) {
     database(getOnePostToInfoPostDetails(postID))
         .then((p) => {
@@ -217,6 +295,14 @@ function tryToGetInformationAboutOnePostSimple(request, response, postID, argume
         });
 }
 
+/**
+ *
+ * @param request
+ * @param response
+ * @param postID
+ * @param argumentsArr
+ * @param post
+ */
 function tryToGetInformationAboutOnePostSimplePartTwo(request, response, postID, argumentsArr, post) {
     info("Post Exists");
     if(!argumentsArr["related"]) {
