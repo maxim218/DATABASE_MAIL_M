@@ -138,7 +138,6 @@ function createIndexes() {
         "INDEX **** ON thread (LOWER(thread_slug), thread_id)",
         "UNIQUE INDEX **** ON jointable (jointable_forum_id, jointable_user_id)",
         "UNIQUE INDEX **** ON vote (vote_student_id, vote_thread_id)",
-        "INDEX **** ON vote (vote_student_id, vote_thread_id, vote_voice)",
         "INDEX **** ON thread (LOWER(thread_slug), thread_id, thread_slug, thread_forum_slug, thread_forum_id)",
         "INDEX **** ON thread (thread_id, thread_slug, thread_forum_slug, thread_forum_id)",
         "INDEX **** ON post (post_thread_id, post_id, post_main_array)",

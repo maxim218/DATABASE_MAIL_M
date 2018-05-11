@@ -194,10 +194,8 @@ function getVoiceVoteStudentValue(studentID, threadID) {
  */
 function getDelta(oldV, newV) {
     if(oldV === newV) return 0;
-    if(oldV === -1 && newV === 1) return 2;
-    if(oldV === 1 && newV === -1) return -2;
-    info("Generate votes Error !!!");
-    throw new Error();
+    if(oldV === -1) return 2;
+    return -2;
 }
 
 /**
@@ -215,8 +213,6 @@ function needToUpdateFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, re
            const oldVoice = p.rows[0].vote_voice;
            const newVoice = mainObj.voice;
            info("************");
-           info("Old voice: " + oldVoice);
-           info("New voice: " + newVoice);
 
            const delta = getDelta(oldVoice, newVoice);
 
@@ -321,7 +317,7 @@ function insertOKFunctryToAddOrUpdateVoteOfUserToThreadPartThree(request, respon
                        title: thread.thread_title,
                        votes: thread.thread_votes,
                    };
-                   if(onlyNumbers(thread.thread_slug) === false) {
+                   if(!onlyNumbers(thread.thread_slug)) {
                        threadResult.slug = thread.thread_slug;
                    }
                    answer(response, 200, str(threadResult));

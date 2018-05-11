@@ -120,22 +120,32 @@ function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, 
             const parrentsExistingInDatabase = p.rows;
             let result = "YES";
 
-            commentsList.forEach((comment) => {
+            for(let index_comment = 0;  index_comment < commentsList.length; index_comment++) {
+                const comment = commentsList[index_comment];
+
                 let exists = false;
+
                 if(!comment.parent) {
                     exists = true;
+                    continue;
                 }
+
                 if(!exists) {
-                    parrentsExistingInDatabase.forEach((parrentComment) => {
+                    for(let index_parrentComment = 0; index_parrentComment < parrentsExistingInDatabase.length; index_parrentComment++) {
+                        const parrentComment = parrentsExistingInDatabase[index_parrentComment];
                         if (comment.parent === parrentComment.post_id) {
                             exists = true;
+                            break;
                         }
-                    });
+                    }
                 }
+
                 if(!exists) {
                     result = "NO";
+                    break;
                 }
-            });
+            }
+
             if(result === "NO") {
                 answer(response, 409, str({
                     message: result,
@@ -189,14 +199,17 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
             const studentsExistsInDatabase = p.rows;
             let result = "YES";
             commentsList.forEach((comment) => {
+                const commentAuthorToLowerCase = comment.author.toLowerCase();
                 let exists = false;
-                studentsExistsInDatabase.forEach((student) => {
-                    if(comment.author.toLowerCase() === student.student_nickname.toLowerCase()) {
+                for(let index_student = 0; index_student < studentsExistsInDatabase.length; index_student++) {
+                    const student = studentsExistsInDatabase[index_student];
+                    if(commentAuthorToLowerCase === student.student_nickname.toLowerCase()) {
                         exists = true;
                         comment.studentId = student.student_id;
                         comment.author = student.student_nickname;
+                        break;
                     }
-                });
+                }
                 if(!exists) {
                     result = "NO";
                 }
@@ -232,7 +245,8 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
 
         let exists = false;
 
-        parrentsExistingInDatabase.forEach((parent) => {
+        for(let index = 0; index < parrentsExistingInDatabase.length; index++) {
+            const parent = parrentsExistingInDatabase[index];
             if(comment.parent === parent.post_id) {
                 comment.root = 0;
                 let arr = parent.post_main_array;
@@ -240,8 +254,9 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
                 makeDouble(comment.path, arr);
                 exists = true;
                 comment.path.push(comment.commentID);
+                break;
             }
-        });
+        }
 
         if(!exists || comment.parent === 0) {
             comment.root = comment.commentID;
@@ -250,8 +265,6 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
             comment.root = comment.path[0];
             comment.path = "ARRAY [ " +  comment.path.join(" , ") + " ] ";
         }
-
-        comment.path = "" + comment.path;
 
         const buffer = [];
         buffer.push("INSERT INTO post (");
@@ -337,9 +350,6 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
                 .then((p1) => {
                     database(addingJoiningPairsForumStudent(commentsList, thread))
                         .then((p2) => {
-                            if(p2.err) {
-                                throw new Error();
-                            }
                             answer(response, 201, str(arr));
                         });
                 });
