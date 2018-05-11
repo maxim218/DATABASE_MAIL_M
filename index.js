@@ -1596,6 +1596,27 @@ function controlThreadParamsSlugAndIdParam(threadSlugId, continueMethod) {
 
 /**
  *
+ * @param comment
+ * @param studentsExistsInDatabase
+ * @returns {boolean}
+ */
+function tryControStudentAuthorID(comment, studentsExistsInDatabase) {
+    const commentAuthorToLowerCase = comment.author.toLowerCase();
+    let exists = false;
+    for(let index_student = 0; index_student < studentsExistsInDatabase.length; index_student++) {
+        const student = studentsExistsInDatabase[index_student];
+        if(commentAuthorToLowerCase === student.student_nickname.toLowerCase()) {
+            exists = true;
+            comment.studentId = student.student_id;
+            comment.author = student.student_nickname;
+            break;
+        }
+    }
+    return exists;
+}
+
+/**
+ *
  * @param request
  * @param response
  * @param commentsList
@@ -1676,33 +1697,21 @@ function tryToAddBigListOfPostsPartTwo(request, response, commentsList, part_3, 
         .then((p) => {
             const parrentsExistingInDatabase = p.rows;
             let result = "YES";
-
             for(let index_comment = 0;  index_comment < commentsList.length; index_comment++) {
                 const comment = commentsList[index_comment];
-
                 let exists = false;
-
                 if(!comment.parent) {
                     exists = true;
                     continue;
                 }
-
                 if(!exists) {
-                    for(let index_parrentComment = 0; index_parrentComment < parrentsExistingInDatabase.length; index_parrentComment++) {
-                        const parrentComment = parrentsExistingInDatabase[index_parrentComment];
-                        if (comment.parent === parrentComment.post_id) {
-                            exists = true;
-                            break;
-                        }
-                    }
+                    exists = parrentsExistingInDatabaseControlParrents(parrentsExistingInDatabase, comment, exists);
                 }
-
                 if(!exists) {
                     result = "NO";
                     break;
                 }
             }
-
             if(result === "NO") {
                 answer(response, 409, str({
                     message: result,
@@ -1756,17 +1765,7 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
             const studentsExistsInDatabase = p.rows;
             let result = "YES";
             commentsList.forEach((comment) => {
-                const commentAuthorToLowerCase = comment.author.toLowerCase();
-                let exists = false;
-                for(let index_student = 0; index_student < studentsExistsInDatabase.length; index_student++) {
-                    const student = studentsExistsInDatabase[index_student];
-                    if(commentAuthorToLowerCase === student.student_nickname.toLowerCase()) {
-                        exists = true;
-                        comment.studentId = student.student_id;
-                        comment.author = student.student_nickname;
-                        break;
-                    }
-                }
+                const exists = tryControStudentAuthorID(comment, studentsExistsInDatabase);
                 if(!exists) {
                     result = "NO";
                 }
@@ -1779,6 +1778,21 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
                 tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3, thread, parrentsExistingInDatabase);
             }
         });
+}
+
+/**
+ * init root and path of element
+ * @param comment
+ * @param flag
+ */
+function tryInitCommentWay(comment, flag) {
+    if(flag) {
+        comment.root = comment.commentID;
+        comment.path = " ARRAY [ " + comment.commentID + " ] ";
+    } else {
+        comment.root = comment.path[0];
+        comment.path = " ARRAY [ " +  comment.path.join(" , ") + " ] ";
+    }
 }
 
 /**
@@ -1815,13 +1829,7 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
             }
         }
 
-        if(!exists || comment.parent === 0) {
-            comment.root = comment.commentID;
-            comment.path = " ARRAY [ " + comment.commentID + " ] ";
-        } else {
-            comment.root = comment.path[0];
-            comment.path = "ARRAY [ " +  comment.path.join(" , ") + " ] ";
-        }
+        tryInitCommentWay(comment,testFistElFirstElement(exists, comment));
 
         const buffer = [];
         buffer.push("INSERT INTO post (");
@@ -1956,6 +1964,32 @@ function addPostsNumberInOneForumQuery(postNumberAll, thread) {
     buffer.push("forum_posts = forum_posts + " + postNumberAll + " ");
     buffer.push("WHERE forum_id = " + thread.forumID + "; ");
     return buffer.join(" ");
+}
+
+/**
+ * is it only one element in array
+ * @returns {boolean}
+ */
+function testFistElFirstElement(exists, comment) {
+    return !exists || !comment.parent;
+}
+
+/**
+ *
+ * @param parrentsExistingInDatabase
+ * @param comment
+ * @param exists
+ * @returns {*}
+ */
+function parrentsExistingInDatabaseControlParrents(parrentsExistingInDatabase, comment, exists) {
+    for(let index_parrentComment = 0; index_parrentComment < parrentsExistingInDatabase.length; index_parrentComment++) {
+        const parrentComment = parrentsExistingInDatabase[index_parrentComment];
+        if (comment.parent === parrentComment.post_id) {
+            exists = true;
+            break;
+        }
+    }
+    return exists;
 }
 
 
