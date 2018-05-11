@@ -38,9 +38,14 @@ const ARR = " INTEGER [] DEFAULT ARRAY [0]";
 const FORUM = "forum";
 const THREAD = "thread";
 const COMMENT = "post";
+const BUFFER = " ARRAY ";
 const STUDENT = "student";
+const POINT = ",";
 const OK = 200;
+const LEFT = "[";
+const RIGHT = "]";
 const TIMER_WAIT_TIME_PARAM = 1;
+const FIRST_INDEX = 0;
 const SORT_TYPE_1 = "flat";
 const SORT_TYPE_2 = "tree";
 const SORT_TYPE_3 = "parent_tree";
@@ -1787,11 +1792,9 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
  */
 function tryInitCommentWay(comment, flag) {
     if(flag) {
-        comment.root = comment.commentID;
-        comment.path = " ARRAY [ " + comment.commentID + " ] ";
+        commentFirstPath(comment);
     } else {
-        comment.root = comment.path[0];
-        comment.path = " ARRAY [ " +  comment.path.join(" , ") + " ] ";
+        commentLongWay(comment);
     }
 }
 
@@ -1990,6 +1993,24 @@ function parrentsExistingInDatabaseControlParrents(parrentsExistingInDatabase, c
         }
     }
     return exists;
+}
+
+/**
+ * init my self
+ * @param comment
+ */
+function commentFirstPath(comment) {
+    comment.root = comment.commentID;
+    comment.path = BUFFER + LEFT + comment.commentID + RIGHT;
+}
+
+/**
+ * init elements before
+ * @param comment
+ */
+function commentLongWay(comment) {
+    comment.root = comment.path[FIRST_INDEX];
+    comment.path = BUFFER +  LEFT +  comment.path.join(POINT) + RIGHT;
 }
 
 

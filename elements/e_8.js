@@ -230,11 +230,9 @@ function tryToAddBigListOfPostsPartThree(request, response, commentsList, part_3
  */
 function tryInitCommentWay(comment, flag) {
     if(flag) {
-        comment.root = comment.commentID;
-        comment.path = " ARRAY [ " + comment.commentID + " ] ";
+        commentFirstPath(comment);
     } else {
-        comment.root = comment.path[0];
-        comment.path = " ARRAY [ " +  comment.path.join(" , ") + " ] ";
+        commentLongWay(comment);
     }
 }
 
@@ -433,4 +431,22 @@ function parrentsExistingInDatabaseControlParrents(parrentsExistingInDatabase, c
         }
     }
     return exists;
+}
+
+/**
+ * init my self
+ * @param comment
+ */
+function commentFirstPath(comment) {
+    comment.root = comment.commentID;
+    comment.path = BUFFER + LEFT + comment.commentID + RIGHT;
+}
+
+/**
+ * init elements before
+ * @param comment
+ */
+function commentLongWay(comment) {
+    comment.root = comment.path[FIRST_INDEX];
+    comment.path = BUFFER +  LEFT +  comment.path.join(POINT) + RIGHT;
 }
