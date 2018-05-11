@@ -85,13 +85,13 @@ function tryToAddBigListOfPosts(request, response, commentsList, part_3) {
 }
 
 /**
- *
+ * init all parrents of every comment
  * @param commentsList
  */
 function addParentIfNessesary(commentsList) {
     commentsList.forEach((comment) => {
         if(!comment.parent) {
-            comment.parent = 0;
+            comment.parent = FIRST_INDEX;
         }
     });
 }
