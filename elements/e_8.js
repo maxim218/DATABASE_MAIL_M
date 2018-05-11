@@ -260,10 +260,9 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
         for(let index = 0; index < parrentsExistingInDatabase.length; index++) {
             const parent = parrentsExistingInDatabase[index];
             if(comment.parent === parent.post_id) {
-                comment.root = 0;
+                comment.root = FIRST_INDEX;
                 let arr = parent.post_main_array;
-                comment.path = [];
-                makeDouble(comment.path, arr);
+                comment.path = makeDouble(arr);
                 exists = true;
                 comment.path.push(comment.commentID);
                 break;

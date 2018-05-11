@@ -179,13 +179,14 @@ function getSort(argumentsArr) {
 
 /**
  * duplicate integer arrays
- * @param resultArray
  * @param buffer
  */
-function makeDouble(resultArray, buffer) {
+function makeDouble(buffer) {
+    const resultArray = [];
     buffer.forEach((element) => {
         resultArray.push(element);
     });
+    return resultArray;
 }
 
 /**
