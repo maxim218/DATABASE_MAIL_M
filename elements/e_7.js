@@ -216,6 +216,15 @@ function tryToCreateThreadInForumPartFourLast(request, response, mainObj, part_3
                                threadResult.slug = thread.thread_slug;
                            }
                            info("END end of big function");
+                           /////////////////////////////////////////////////
+                           // push threads
+                           lowerThreadsBuffer.push({
+                              id: thread.thread_id.toString(),
+                              slug: thread.thread_slug.toString().toLowerCase(),
+                              arr: [],
+                              free: true,
+                           });
+                           /////////////////////////////////////////////////
                            answer(response, 201, str(threadResult));
                        });
                 });

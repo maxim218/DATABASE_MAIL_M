@@ -95,16 +95,18 @@ let arrGlobal = getEmptyArray();
 let emptyProc = true;
 
 /**
- * push the query to queue
+ *
  * @param request
  * @param response
  * @param bodyObj
+ * @param parts
  */
-function pushQueryInformationToGlobalArr(request, response, bodyObj) {
+function pushQueryInformationToGlobalArr(request, response, bodyObj, parts) {
     const resObj = {
         request: request,
         response: response,
         bodyObj: bodyObj,
+        parts: parts,
     };
     arrGlobal.push(resObj);
 }
@@ -114,7 +116,7 @@ setInterval(() => {
         if(emptyProc) {
             emptyProc = false;
             const mainObj = arrGlobal[0];
-            postQueryExe(mainObj.request, mainObj.response, mainObj.bodyObj);
+            postQueryExe(mainObj.request, mainObj.response, mainObj.bodyObj, mainObj.parts);
         }
 
         if(!emptyProc) {
@@ -127,33 +129,112 @@ setInterval(() => {
     }
 }, TIMER_WAIT_TIME_PARAM);
 
+
+const lowerThreadsBuffer = [];
+
+setInterval(() => {
+    lowerThreadsBuffer.forEach((queueObj) => {
+        if(queueObj.arr.length > 0) {
+            const queueObjArrZero = queueObj.arr[0];
+
+            if(queueObj.free === true) {
+                queueObj.free = false;
+                tryToAddOrUpdateVoteOfUserToThread(queueObjArrZero.request, queueObjArrZero.response, queueObjArrZero.mainObj, queueObjArrZero.parts[3]);
+            }
+
+            if(queueObj.free === false) {
+                if(queueObjArrZero.response.finished) {
+                    queueObj.arr.splice(0,1);
+                    queueObj.free = true;
+                }
+            }
+        }
+    });
+}, TIMER_WAIT_TIME_PARAM);
+
 /**
  * catch Post query and save it to queue
  * @param request
  * @param response
  */
 function postQuery(request, response) {
-    if(request.url === "/api/service/clear") {
-        pushQueryInformationToGlobalArr(request, response, getObj());
-    } else {
-        const dataArr = [];
-        request.on('data', (data) => {
-            dataArr.push(data.toString());
-        }).on('end', () => {
-            const mainObj = obj(dataArr.join(""));
-            pushQueryInformationToGlobalArr(request, response, mainObj);
-        });
-    }
+        const parts = request.url.split(MAIN_SPLIT_CHAR);
+        const part_4 = parts[4];
+
+        if (request.url === "/api/service/clear") {
+            pushQueryInformationToGlobalArr(request, response, getObj(), parts);
+        } else {
+            const dataArr = [];
+            request.on('data', (data) => {
+                dataArr.push(data.toString());
+            }).on('end', () => {
+                const mainObj = obj(dataArr.join(""));
+
+                if(part_4 !== "vote") {
+                    pushQueryInformationToGlobalArr(request, response, mainObj, parts);
+                } else {
+                    // vote
+                    // vote
+                    // vote
+
+                    const voteSlugID = parts[3].toLowerCase();
+                    let slugType = false;
+                    let idType = false;
+
+                    if(onlyNumbers(voteSlugID) === true) {
+                        idType = true;
+                    } else {
+                        slugType = true;
+                    }
+
+                    let threadIndex = -1;
+
+                    if(idType === true) {
+                        for (let i = 0; i < lowerThreadsBuffer.length; i++) {
+                            if(lowerThreadsBuffer[i].id === voteSlugID) {
+                                threadIndex = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(slugType === true) {
+                        for (let i = 0; i < lowerThreadsBuffer.length; i++) {
+                            if(lowerThreadsBuffer[i].slug === voteSlugID) {
+                                threadIndex = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(threadIndex === -1) {
+                        answer(response, 404, str({
+                            message: voteSlugID,
+                        }));
+                        return null;
+                    }
+
+                    const queueObj = lowerThreadsBuffer[threadIndex];
+                    queueObj.arr.push({
+                        request: request,
+                        response: response,
+                        mainObj: mainObj,
+                        parts: parts,
+                    });
+                }
+            });
+        }
 }
 
 /**
- * catch Post queries and call functions
+ *
  * @param request
  * @param response
  * @param mainObj
+ * @param parts
  * @returns {null}
  */
-function postQueryExe(request, response, mainObj) {
+function postQueryExe(request, response, mainObj, parts) {
     if(mainObj) {
         if (request.url === "/api/service/clear") {
             database(result)
@@ -165,15 +246,14 @@ function postQueryExe(request, response, mainObj) {
             return null;
         }
 
+        const part_2 = parts[2];
+        const part_3 = parts[3];
+        const part_4 = parts[4];
+
         if (request.url === "/api/forum/create") {
             tryToAddNewForumOfStudentToDatabase(request, response, mainObj);
             return null;
         }
-
-        const parts = request.url.split(MAIN_SPLIT_CHAR);
-        const part_2 = parts[2];
-        const part_3 = parts[3];
-        const part_4 = parts[4];
 
         if (twoPartsService(part_2, "thread", part_4, "vote")) {
             tryToAddOrUpdateVoteOfUserToThread(request, response, mainObj, part_3);
