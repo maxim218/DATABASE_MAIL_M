@@ -237,6 +237,23 @@ function tryInitCommentWay(comment, flag) {
 }
 
 /**
+ * parrents exists control
+ * @param comment
+ * @param parent
+ * @param exists
+ * @returns {*}
+ */
+function generatePathWayOfPostWithParent(comment, parent, exists) {
+    if(comment.parent === parent.post_id) {
+        comment.root = FIRST_INDEX;
+        comment.path = makeDouble(parent.post_main_array);
+        exists = true;
+        addPostToPostPath(comment);
+    }
+    return exists;
+}
+
+/**
  *
  * @param request
  * @param response
@@ -259,11 +276,8 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
 
         for(let index = 0; index < parrentsExistingInDatabase.length; index++) {
             const parent = parrentsExistingInDatabase[index];
-            if(comment.parent === parent.post_id) {
-                comment.root = FIRST_INDEX;
-                comment.path = makeDouble(parent.post_main_array);
-                exists = true;
-                addPostToPostPath(comment);
+            exists = generatePathWayOfPostWithParent(comment, parent, exists);
+            if(exists) {
                 break;
             }
         }
