@@ -494,6 +494,12 @@ function includeString(bigString, littleString) {
 
 "use strict";
 
+////////////////////////////////////////
+
+// Modify queue
+
+////////////////////////////////////////
+
 /**
  * get array (for debug)
  * @returns {Array}
