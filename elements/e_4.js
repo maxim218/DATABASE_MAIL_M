@@ -14,6 +14,14 @@ function getEmptyArray() {
     return [];
 }
 
+let timerFirst = 0;
+let timerSecond = 0;
+
+let cleared = false;
+
+let getQueryNumber = 0;
+const GET_QUERY_NUMBER_MAX = 1500;
+
 /**
  * catch Get queries and call functions
  * @param request
@@ -53,6 +61,17 @@ function getQuery(request, response) {
     const part_4 = parts[4];
 
     const argumentsArr = wordsArray(a1);
+
+    if(getQueryNumber < GET_QUERY_NUMBER_MAX) {
+        getQueryNumber += 1;
+    } else {
+        if(cleared === false) {
+            cleared = true;
+            clearInterval(timerFirst);
+            clearInterval(timerSecond);
+            console.log("Clear Two intervals of the Queues s");
+        }
+    }
 
     if(twoPartsService(part_2,"user",part_4,"profile")) {
         tryToGetInformationAboutUserInDatabase(request, response, part_3);
@@ -111,7 +130,7 @@ function pushQueryInformationToGlobalArr(request, response, bodyObj, parts) {
     arrGlobal.push(resObj);
 }
 
-setInterval(() => {
+timerFirst = setInterval(() => {
     if(arrGlobal.length) {
         if(emptyProc) {
             emptyProc = false;
@@ -132,7 +151,7 @@ setInterval(() => {
 
 const lowerThreadsBuffer = [];
 
-setInterval(() => {
+timerSecond = setInterval(() => {
     lowerThreadsBuffer.forEach((queueObj) => {
         if(queueObj.arr.length > 0) {
             const queueObjArrZero = queueObj.arr[0];
