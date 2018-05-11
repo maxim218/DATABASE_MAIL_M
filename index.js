@@ -493,6 +493,14 @@ function includeString(bigString, littleString) {
     return bigString.indexOf(littleString) !== NO;
 }
 
+/**
+ * add post to stack of posts
+ * @param comment
+ */
+function addPostToPostPath(comment) {
+    comment.path.push(comment.commentID);
+}
+
 
 
 // ********************************
@@ -1824,10 +1832,9 @@ function tryToAddBigListOfPostsPartFour(request, response, commentsList, part_3,
             const parent = parrentsExistingInDatabase[index];
             if(comment.parent === parent.post_id) {
                 comment.root = FIRST_INDEX;
-                let arr = parent.post_main_array;
-                comment.path = makeDouble(arr);
+                comment.path = makeDouble(parent.post_main_array);
                 exists = true;
-                comment.path.push(comment.commentID);
+                addPostToPostPath(comment);
                 break;
             }
         }

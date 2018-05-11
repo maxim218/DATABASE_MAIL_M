@@ -198,3 +198,11 @@ function makeDouble(buffer) {
 function includeString(bigString, littleString) {
     return bigString.indexOf(littleString) !== NO;
 }
+
+/**
+ * add post to stack of posts
+ * @param comment
+ */
+function addPostToPostPath(comment) {
+    comment.path.push(comment.commentID);
+}
